@@ -129,14 +129,14 @@ let ws;
 let lastActivity = Date.now();
 
 function setupPresence() {
-    ws = new WebSocket("ws://localhost:8080");
+    ws = new WebSocket("wss://yc-cs4630-sp26.fly.dev");
 
     ws.onmessage = event => {
         const { online, idle } = JSON.parse(event.data);
         updatePresenceUI(online, idle);
     };
 
-    ["mousemove", "keydown", "click"].forEach(evt => {
+    ["mousemove", "keydown", "click"]. forEach(evt => {
         document.addEventListener(evt, () => {
             lastActivity = Date.now();
             ws.send("active");
