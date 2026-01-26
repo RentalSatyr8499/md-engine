@@ -29,7 +29,8 @@ async function fetchDirectoryListing(path) {
 }
 
 async function loadNotesets() {
-    const notesetDirs = await fetchDirectoryListing(ROOT);
+    const res = await fetch("/assets/notesets/manifest.json");
+    const notesetDirs = await res.json();
 
     const container = document.getElementById("content");
     container.innerHTML = `
@@ -38,9 +39,7 @@ async function loadNotesets() {
         </div>
     `;
 
-    notesetDirs.forEach(dir => {
-        const name = dir.replace("/", "");
-
+    Object.keys(notesetDirs).forEach(name => {
         const item = document.createElement("div");
         item.className = "noteset-item";
         item.textContent = name;
@@ -49,11 +48,11 @@ async function loadNotesets() {
 
         document.getElementById("main-container").appendChild(item);
     });
-
 }
 
 async function loadNoteset(name) {
     const container = document.getElementById("content");
+
     container.innerHTML = ` 
         <div class="noteset-header"> 
             <img src="./assets/back.png" class="back-button" alt="Back">
@@ -64,63 +63,60 @@ async function loadNoteset(name) {
     
     document.querySelector(".back-button").onclick = () => loadNotesets();
 
-    const notes = await fetchDirectoryListing(`${ROOT}${name}/`);
-    const mdFiles = notes.filter(n => n.endsWith(".md"));
+    // Load manifest
+    const res = await fetch("/assets/notesets/manifest.json");
+    const manifest = await res.json();
+
+    const mdFiles = manifest[name];
+
+    if (!mdFiles) {
+        document.getElementById("loading-message").textContent =
+            "No notes found for this noteset.";
+        return;
+    }
 
     document.querySelector("#loading-message").remove();
-    
+
     for (const file of mdFiles) {
-        const noteTitle = file.replace(".md", "");
-
-        const header = document.createElement("h2");
-        header.textContent = noteTitle;
-        header.className = "collapsible";
-
-        const content = document.createElement("div");
-        content.className = "note-content";
-        content.style.display = "block";
-
-        header.onclick = () => {
-            content.style.display = content.style.display === "none" ? "block" : "none";
-        };
-
-        container.appendChild(header);
-        container.appendChild(content);
-
-        // Load markdown
-        const md = await fetch(`${ROOT}${name}/${file}`).then(r => r.text());
-        let html = marked.parse(md);
-
-        // Replace {{answer}} with blanks
-        html = html.replace(/\{\{(.*?)\}\}/g, (_, p1) =>
-            `<span class="blank" onclick="this.classList.toggle('show')">${p1}</span>`
-        );
-
-        content.innerHTML = html;
-
-        // Highlight code blocks
-        content.querySelectorAll("pre code").forEach(block => {
-            hljs.highlightElement(block);
-        });
+        const notePath = `/assets/notesets/${name}/${file}`;
+        await loadMarkdownNote(notePath);
     }
 }
 
-async function loadMarkdown() {
-    const response = await fetch("notes.md");
-    const text = await response.text();
+async function loadMarkdownNote(file) {
+    const container = document.getElementById("content");
+    const noteTitle = file
+        .split("/")
+        .pop()
+        .replace(".md", "");
+    const header = document.createElement("h2");
+    header.textContent = noteTitle;
+    header.className = "collapsible";
 
-    // Convert Markdown → HTML
-    let html = marked.parse(text);
+    const content = document.createElement("div");
+    content.className = "note-content";
+    content.style.display = "block";
 
-    // Replace {{answer}} with clickable spans
-    html = html.replace(/\{\{(.*?)\}\}/g, (match, p1) => {
-        return `<span class="blank" onclick="this.classList.toggle('show')">${p1}</span>`;
-    });
+    header.onclick = () => {
+        content.style.display = content.style.display === "none" ? "block" : "none";
+    };
 
-    document.getElementById("content").innerHTML = html;
+    container.appendChild(header);
+    container.appendChild(content);
+
+    // Load markdown
+    const md = await fetch(file).then(r => r.text());
+    let html = marked.parse(md);
+
+    // Replace {{answer}} with blanks
+    html = html.replace(/\{\{(.*?)\}\}/g, (_, p1) =>
+        `<span class="blank" onclick="this.classList.toggle('show')">${p1}</span>`
+    );
+
+    content.innerHTML = html;
 
     // Highlight code blocks
-    document.querySelectorAll("pre code").forEach(block => {
+    content.querySelectorAll("pre code").forEach(block => {
         hljs.highlightElement(block);
     });
 }
