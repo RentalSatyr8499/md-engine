@@ -1,0 +1,148 @@
+body {
+    font-family: system-ui, sans-serif;
+    line-height: 1.6;
+    color: #222;
+    align-items: center;
+    justify-content: center;
+}
+
+#content {
+    margin-left: 10vw;
+    margin-right: 10vw;
+    align-items: center;
+    justify-content: center;
+    height: 90vh;
+}
+
+code, pre {
+    font-family: "Fira Code", monospace;
+    font-size: 0.95rem;
+}
+
+code {
+    background: #e9ecef;
+    border-radius: 4px;
+    padding: 0 4px;
+}
+
+
+pre {
+    background: #f6f8fa;
+    padding: 12px;
+    border-radius: 6px;
+    overflow-x: auto;
+}
+
+.blank {
+    background: #ddd;
+    color: transparent;
+    border-radius: 4px;
+    padding: 0 4px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.blank code {
+    background: transparent;
+    padding: 0;
+}
+
+.blank.show {
+    color: black;
+    background: #f7f7f7;
+}
+
+.blank.show code {
+    background: #e9ecef;
+    padding: 0 4px;
+}
+
+
+
+button {
+    display: block;
+    margin: 10px 0;
+    padding: 10px;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+.collapsible {
+    cursor: pointer;
+    background: #eee;
+    padding: 10px;
+    border-radius: 4px;
+    margin-top: 20px;
+}
+
+.note-content {
+    padding: 10px 15px;
+    border-left: 3px solid #ccc;
+    margin-bottom: 20px;
+}
+
+.back-button {
+    width: 5vw;
+    height: 5vw;
+    cursor: pointer;
+}
+
+.noteset-header {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 3vw;
+}
+
+#main-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-items: center;
+    justify-content: center;
+    width: 80vw;
+    height: 80vh;
+
+}
+
+.noteset-item {
+    font-size: 1.2rem;
+    padding: 8px 0;
+    cursor: pointer;
+    color: #333;
+    transition: color 0.2s;
+}
+
+.noteset-item:hover {
+    color: #1a73e8; /* Google blue */
+}
+
+#presence-indicator {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+
+    background: #ffffff;
+    color: rgb(0, 0, 0);
+    padding: 0px 12px;
+
+    border-radius: 2rem;
+    border-width: 1px;
+    border-color: rgb(0, 0, 0);
+    border-style: solid;
+    font-size: 0.9rem;
+    
+    z-index: 999;
+}
+
+
+#presence-indicator img {
+    width: 0.5rem;
+    height: 0.5rem;
+}
+
