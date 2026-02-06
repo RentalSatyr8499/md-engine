@@ -1,7 +1,7 @@
 const ROOT = "assets/notesets/";
 
 const config = {
-    siteTitle: "CS 4630",
+    siteTitle: "xaqnotes",
     "secondsUntilIdle": 60
 };
 
@@ -28,13 +28,38 @@ async function fetchDirectoryListing(path) {
     return links;
 }
 
-async function loadNotesets() {
-    const notesetDirs = await fetchDirectoryListing(ROOT);
-
+async function loadClasses() {
+    const classDirs = await fetchDirectoryListing("notes/");
     const container = document.getElementById("content");
     container.innerHTML = `
         <div id="main-container">
             <h1>${config.siteTitle}</h1>
+        </div>
+    `;
+
+    classDirs.forEach(dir => {
+        const name = dir.replace("notes/", "");
+
+        const item = document.createElement("div");
+        item.className = "noteset-item";
+        item.textContent = name;
+
+        item.onclick = () => {
+            history.pushState({}, "", `/${name}` + encodeURIComponent(name));
+            loadNotesets(name);
+        };
+
+        document.getElementById("main-container").appendChild(item);
+    });
+}
+
+async function loadNotesets(className) {
+    const notesetDirs = await fetchDirectoryListing(`notes/${className}/`);
+
+    const container = document.getElementById("content");
+    container.innerHTML = `
+        <div id="main-container">
+            <h1>${className}</h1>
         </div>
     `;
 
@@ -190,15 +215,26 @@ function setupRevealToggle() {
 }
 
 function routeFromURL() {
-    const params = new URLSearchParams(window.location.search);
-    const noteset = params.get("noteset");
+  const path = window.location.pathname.split("/").filter(Boolean);
 
-    if (noteset) {
-        loadNoteset(noteset);
-    } else {
-        loadNotesets();
-    }
+  if (path.length === 0) {
+    loadClasses();
+    return;
+  }
+
+  if (path.length === 1) {
+    const className = path[0];
+    loadNotesets(className);
+    return;
+  }
+
+  if (path.length === 2) {
+    const [className, noteset] = path;
+    loadNoteset(className, noteset);
+    return;
+  }
 }
+
 
 
 

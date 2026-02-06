@@ -1,0 +1,3 @@
+[[statics]]
+  guest_path = "/app/notes"
+  url_prefix = "/notes"
