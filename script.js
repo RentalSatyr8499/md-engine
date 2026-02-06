@@ -65,23 +65,26 @@ async function loadNoteset(name) {
     document.querySelector(".back-button").onclick = () => loadNotesets();
 
     const notes = await fetchDirectoryListing(`${ROOT}${name}/`);
-    const mdFiles = notes.filter(n => n.endsWith(".md"));
+
+    const mdFiles = notes
+        .filter(n => n.endsWith(".md"))
+        .sort((a, b) => b.localeCompare(a));
 
     document.querySelector("#loading-message").remove();
-    
+
     for (const file of mdFiles) {
-        const noteTitle = file.replace(".md", "");
+        const noteTitle = file.slice(3).replace(".md", "");
 
         const header = document.createElement("h2");
         header.textContent = noteTitle;
-        header.className = "collapsible";
+        header.className = "collapsible-header";
 
         const content = document.createElement("div");
-        content.className = "note-content";
-        content.style.display = "block";
+        content.classList.add("note-content");
+        content.classList.add("collapsible-content");
 
         header.onclick = () => {
-            content.style.display = content.style.display === "none" ? "block" : "none";
+            content.classList.toggle("open");
         };
 
         container.appendChild(header);
@@ -95,6 +98,9 @@ async function loadNoteset(name) {
         html = html.replace(/\{\{(.*?)\}\}/g, (_, p1) =>
             `<span class="blank" onclick="this.classList.toggle('show')">${p1}</span>`
         );
+        html = html.replace(/(\S)\^(\S+)/g, (match, base, sup) => { return `${base}<sup>${sup}</sup>`; }); 
+
+        html = html.replace(/(\S)_(\S+)/g, (match, base, sub) => { return `${base}<sub>${sub}</sub>`; });
 
         content.innerHTML = html;
 
@@ -105,25 +111,6 @@ async function loadNoteset(name) {
     }
 }
 
-async function loadMarkdown() {
-    const response = await fetch("notes.md");
-    const text = await response.text();
-
-    // Convert Markdown → HTML
-    let html = marked.parse(text);
-
-    // Replace {{answer}} with clickable spans
-    html = html.replace(/\{\{(.*?)\}\}/g, (match, p1) => {
-        return `<span class="blank" onclick="this.classList.toggle('show')">${p1}</span>`;
-    });
-
-    document.getElementById("content").innerHTML = html;
-
-    // Highlight code blocks
-    document.querySelectorAll("pre code").forEach(block => {
-        hljs.highlightElement(block);
-    });
-}
 
 let ws;
 let lastActivity = Date.now();
@@ -136,19 +123,20 @@ function setupPresence() {
         updatePresenceUI(online, idle);
     };
 
+    /*
     ["mousemove", "keydown", "click"].forEach(evt => {
         document.addEventListener(evt, () => {
             lastActivity = Date.now();
             ws.send("active");
         });
     });
-
+*/
     document.addEventListener("visibilitychange", () => {
         if (document.hidden) {
             lastActivity = Date.now() - config.secondsUntilIdle*1000;
         } else {
             lastActivity = Date.now();
-            ws.send("active");
+            // ws.send("active");
         }
     });
 
@@ -157,7 +145,7 @@ function setupPresence() {
         const diff = now - lastActivity;
 
         if (diff < config.secondsUntilIdle*1000) {
-            ws.send("active");
+            // ws.send("active");
         }
     }, 5000);
 

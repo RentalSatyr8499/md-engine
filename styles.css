@@ -67,7 +67,7 @@ button {
     cursor: pointer;
 }
 
-.collapsible {
+.collapsible-header {
     cursor: pointer;
     background: #eee;
     padding: 10px;
@@ -79,6 +79,14 @@ button {
     padding: 10px 15px;
     border-left: 3px solid #ccc;
     margin-bottom: 20px;
+}
+.collapsible-content img,
+.note-content img {
+    display: block; 
+    max-width: 50vw; 
+    height: auto;   
+    margin: 20px auto; 
+    object-fit: contain; 
 }
 
 .back-button {
@@ -146,3 +154,12 @@ button {
     height: 0.5rem;
 }
 
+.collapsible-content {
+    overflow: hidden;
+    max-height: 0;
+    transition: max-height 0.2s ease;
+}
+
+.collapsible-content.open {
+    max-height: 1000px; /* something larger than your content */
+}
