@@ -2,7 +2,12 @@ let ws;
 let lastActivity = Date.now();
 
 function setupPresence() {
-    ws = new WebSocket("ws://localhost:8080");
+    const ws = new WebSocket(
+    location.hostname === "localhost"
+        ? "ws://localhost:8080"
+        : "wss://your-app-name.fly.dev"
+    );
+
 
     ws.onmessage = event => {
         const { online, idle } = JSON.parse(event.data);

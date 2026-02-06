@@ -83,7 +83,7 @@ button {
 
 .note-content img {
     display: block; 
-    max-width: 50vw; 
+    max-width: 35vw; 
     height: auto;   
     margin: 20px auto; 
     object-fit: contain; 
