@@ -72,21 +72,37 @@ button {
     background: #eee;
     padding: 10px;
     border-radius: 4px;
-    margin-top: 20px;
+    margin-block-start: 0;
+    margin-block-end: 0.5em;
 }
 
 .note-content {
-    padding: 10px 15px;
     border-left: 3px solid #ccc;
     margin-bottom: 20px;
 }
-.collapsible-content img,
+
 .note-content img {
     display: block; 
     max-width: 50vw; 
     height: auto;   
     margin: 20px auto; 
     object-fit: contain; 
+}
+
+.note-content table {
+    margin: 20px auto;      
+    border-collapse: collapse;
+    text-align: center;     
+}
+
+.note-content th,
+.note-content td {
+    border: 1px solid black;
+}
+
+.note-content th,
+.note-content td {
+    padding: 4px 6px;
 }
 
 .back-button {
@@ -156,10 +172,7 @@ button {
 
 .collapsible-content {
     overflow: hidden;
-    max-height: 0;
-    transition: max-height 0.2s ease;
+    height: 0;
+    transition: height 0.3s ease;
 }
 
-.collapsible-content.open {
-    max-height: 1000px; /* something larger than your content */
-}

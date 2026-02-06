@@ -52,27 +52,85 @@ async function loadNotesets() {
 
 }
 
-async function loadNoteset(name) {
+function buildNotesetUI(name) {
     const container = document.getElementById("content");
-    container.innerHTML = ` 
-        <div class="noteset-header"> 
+
+    container.innerHTML = `
+        <div class="noteset-header">
             <img src="./assets/back.png" class="back-button" alt="Back">
-            <h1>${name}</h1> 
-        </div> 
-        <p id="loading-message">Loading notes…</p> 
-    `; 
-    
+            <h1>${name}</h1>
+        </div>
+        <p id="loading-message">Loading notes…</p>
+    `;
+
     document.querySelector(".back-button").onclick = () => loadNotesets();
 
-    const notes = await fetchDirectoryListing(`${ROOT}${name}/`);
+    return container;
+}
 
+const notesCache = new Map();
+async function loadMarkdownFiles(name) {
+    if (notesCache.has(name)) {
+        return notesCache.get(name);
+    }
+
+    const notes = await fetchDirectoryListing(`${ROOT}${name}/`);
     const mdFiles = notes
         .filter(n => n.endsWith(".md"))
         .sort((a, b) => b.localeCompare(a));
 
-    document.querySelector("#loading-message").remove();
+    const results = [];
 
     for (const file of mdFiles) {
+        const md = await fetch(`${ROOT}${name}/${file}`).then(r => r.text());
+        results.push({ file, md });
+    }
+
+    notesCache.set(name, results);
+    return results;
+}
+
+function transformMarkdown(html) {
+    html = html.replace(/\{\{(.*?)\}\}/g, (_, p1) =>
+        `<span class="blank" onclick="this.classList.toggle('show')">${p1}</span>`
+    );
+    html = html.replace(/(\S)\^(\S+)/g, (_, base, sup) =>
+        `${base}<sup>${sup}</sup>`
+    );
+    html = html.replace(/(\S)_(\S+)/g, (_, base, sub) =>
+        `${base}<sub>${sub}</sub>`
+    );
+    html = html.replace(/\$(.+?)\$/g, (_, expr) =>
+        `<span class="math">${expr}</span>`
+    );
+
+    return html;
+}
+
+function applyCollapsibleBehavior(header, content) {
+    header.onclick = () => {
+        const isOpen = content.classList.toggle("open");
+
+        if (isOpen) {
+            content.style.height = content.scrollHeight + "px";
+            setTimeout(() => (content.style.height = "auto"), 300);
+        } else {
+            content.style.height = content.scrollHeight + "px";
+            requestAnimationFrame(() => {
+                content.style.height = "0px";
+            });
+        }
+    };
+}
+
+async function loadNoteset(name) {
+    const container = buildNotesetUI(name);
+
+    const files = await loadMarkdownFiles(name);
+
+    document.querySelector("#loading-message").remove();
+
+    for (const { file, md } of files) {
         const noteTitle = file.slice(3).replace(".md", "");
 
         const header = document.createElement("h2");
@@ -80,31 +138,18 @@ async function loadNoteset(name) {
         header.className = "collapsible-header";
 
         const content = document.createElement("div");
-        content.classList.add("note-content");
-        content.classList.add("collapsible-content");
+        content.className = "note-content collapsible-content";
 
-        header.onclick = () => {
-            content.classList.toggle("open");
-        };
+        applyCollapsibleBehavior(header, content);
 
         container.appendChild(header);
         container.appendChild(content);
 
-        // Load markdown
-        const md = await fetch(`${ROOT}${name}/${file}`).then(r => r.text());
         let html = marked.parse(md);
-
-        // Replace {{answer}} with blanks
-        html = html.replace(/\{\{(.*?)\}\}/g, (_, p1) =>
-            `<span class="blank" onclick="this.classList.toggle('show')">${p1}</span>`
-        );
-        html = html.replace(/(\S)\^(\S+)/g, (match, base, sup) => { return `${base}<sup>${sup}</sup>`; }); 
-
-        html = html.replace(/(\S)_(\S+)/g, (match, base, sub) => { return `${base}<sub>${sub}</sub>`; });
+        html = transformMarkdown(html);
 
         content.innerHTML = html;
 
-        // Highlight code blocks
         content.querySelectorAll("pre code").forEach(block => {
             hljs.highlightElement(block);
         });
@@ -112,51 +157,4 @@ async function loadNoteset(name) {
 }
 
 
-let ws;
-let lastActivity = Date.now();
-
-function setupPresence() {
-    ws = new WebSocket("ws://localhost:8080");
-
-    ws.onmessage = event => {
-        const { online, idle } = JSON.parse(event.data);
-        updatePresenceUI(online, idle);
-    };
-
-    /*
-    ["mousemove", "keydown", "click"].forEach(evt => {
-        document.addEventListener(evt, () => {
-            lastActivity = Date.now();
-            ws.send("active");
-        });
-    });
-*/
-    document.addEventListener("visibilitychange", () => {
-        if (document.hidden) {
-            lastActivity = Date.now() - config.secondsUntilIdle*1000;
-        } else {
-            lastActivity = Date.now();
-            // ws.send("active");
-        }
-    });
-
-    setInterval(() => {
-        const now = Date.now();
-        const diff = now - lastActivity;
-
-        if (diff < config.secondsUntilIdle*1000) {
-            // ws.send("active");
-        }
-    }, 5000);
-
-}
-
-function updatePresenceUI(online, idle) {
-    document.getElementById("numOnline").textContent = `${online}`;
-    document.getElementById("numIdle").textContent = `${idle}`;
-}
-
-
-setupPresence();
-loadNotesets();
 
