@@ -45,7 +45,12 @@ async function loadNotesets() {
         item.className = "noteset-item";
         item.textContent = name;
 
-        item.onclick = () => loadNoteset(name);
+        item.onclick = () => {
+            history.pushState({}, "", "/?noteset=" + encodeURIComponent(name));
+            loadNoteset(name);
+        };
+
+
 
         document.getElementById("main-container").appendChild(item);
     });
@@ -57,13 +62,17 @@ function buildNotesetUI(name) {
 
     container.innerHTML = `
         <div class="noteset-header">
-            <img src="./assets/back.png" class="back-button" alt="Back">
+            <img src="./assets/back.png" class="back-button" alt="Back" title="view all notesets">
             <h1>${name}</h1>
         </div>
         <p id="loading-message">Loading notes…</p>
     `;
 
-    document.querySelector(".back-button").onclick = () => loadNotesets();
+    document.querySelector(".back-button").onclick = () => {
+        history.pushState({}, "", "/");
+        loadNotesets();
+    };
+
 
     return container;
 }
@@ -92,7 +101,7 @@ async function loadMarkdownFiles(name) {
 
 function transformMarkdown(html) {
     html = html.replace(/\{\{(.*?)\}\}/g, (_, p1) =>
-        `<span class="blank" onclick="this.classList.toggle('show')">${p1}</span>`
+        `<span class="blank" onclick="this.classList.toggle('show')" title="reveal answer">${p1}</span>`
     );
     html = html.replace(/(\S)\^(\S+)/g, (_, base, sup) =>
         `${base}<sup>${sup}</sup>`
@@ -136,6 +145,7 @@ async function loadNoteset(name) {
         const header = document.createElement("h2");
         header.textContent = noteTitle;
         header.className = "collapsible-header";
+        header.title = "click to toggle collapse"
 
         const content = document.createElement("div");
         content.className = "note-content collapsible-content";
@@ -153,6 +163,40 @@ async function loadNoteset(name) {
         content.querySelectorAll("pre code").forEach(block => {
             hljs.highlightElement(block);
         });
+    }
+}
+
+function setupRevealToggle() {
+    const icon = document.getElementById("revealIcon");
+    let revealed = false;
+
+    document.getElementById("reveal-toggle").onclick = () => {
+        revealed = !revealed;
+
+        // Toggle all blanks
+        document.querySelectorAll(".blank").forEach(el => {
+            if (revealed) {
+                el.classList.add("show");
+            } else {
+                el.classList.remove("show");
+            }
+        });
+
+        // Update icon
+        icon.src = revealed
+            ? "./assets/eye-closed.png"
+            : "./assets/eye-open.png";
+    };
+}
+
+function routeFromURL() {
+    const params = new URLSearchParams(window.location.search);
+    const noteset = params.get("noteset");
+
+    if (noteset) {
+        loadNoteset(noteset);
+    } else {
+        loadNotesets();
     }
 }
 

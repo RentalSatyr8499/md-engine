@@ -20,12 +20,11 @@
 
     <script src="./js/presence.js"></script>
     <script src="./js/view.js"></script>
-    <script>
-        loadNotesets();
-        setupPresence();
-    </script>
-
-    <div id="presence-indicator">
+    
+    <div id="reveal-toggle" title="toggle all fill-in-the-blanks">
+        <img id="revealIcon" src="./assets/eye-open.png">
+    </div>
+    <div id="presence-indicator" title="how many people are studying rn">
         <img src="./assets/online.png">
         <p id="numOnline">0</p>
         <p> | </p>
@@ -33,5 +32,11 @@
         <p id="numIdle">0</p>
     </div>
 
+    <script>
+        routeFromURL();
+        setupPresence();
+        setupRevealToggle();
+        window.onpopstate = routeFromURL;
+    </script>
 </body>
 </html>

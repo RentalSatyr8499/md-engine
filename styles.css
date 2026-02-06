@@ -170,6 +170,25 @@ button {
     height: 0.5rem;
 }
 
+#reveal-toggle {
+    position: fixed;
+    bottom: 80px; 
+    right: 25px;
+    cursor: pointer;
+    opacity: 0.8;
+    transition: opacity 0.2s;
+}
+
+#reveal-toggle:hover {
+    opacity: 1;
+}
+
+#reveal-toggle img {
+    width: 3rem;
+    height: 3rem;
+}
+
+
 .collapsible-content {
     overflow: hidden;
     height: 0;
