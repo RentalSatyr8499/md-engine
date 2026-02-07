@@ -30,7 +30,7 @@ function broadcastPresence(room) {
 
 
 wss.on("connection", ws => {
-    clients.set(ws, { lastActive: Date.now(), room });
+    clients.set(ws, { lastActive: Date.now(), room: null });
 
     ws.on("message", raw => {
     const msg = JSON.parse(raw);

@@ -108,7 +108,13 @@ button {
 .back-button {
     width: 5vw;
     height: 5vw;
+    opacity: 0.8;
+    transition: opacity 0.2s;
     cursor: pointer;
+}
+
+.back-button:hover{
+    opacity: 1;
 }
 
 .noteset-header {
@@ -138,7 +144,7 @@ button {
 }
 
 .noteset-item:hover {
-    color: #1a73e8; /* Google blue */
+    color: #e81abb; 
 }
 
 #presence-indicator {
