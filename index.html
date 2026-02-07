@@ -21,10 +21,10 @@
     <script src="./js/presence.js"></script>
     <script src="./js/view.js"></script>
     
-    <div id="reveal-toggle" title="toggle all fill-in-the-blanks">
+    <div id="reveal-toggle" title="toggle all fill-in-the-blanks" style="display: none;">
         <img id="revealIcon" src="./assets/eye-open.png">
     </div>
-    <div id="presence-indicator" title="how many people are studying rn">
+    <div id="presence-indicator" title="how many people are studying rn" style="display: none;">
         <img src="./assets/online.png">
         <p id="numOnline">0</p>
         <p> | </p>
@@ -34,8 +34,6 @@
 
     <script>
         routeFromURL();
-        setupPresence();
-        setupRevealToggle();
         window.onpopstate = routeFromURL;
     </script>
 </body>

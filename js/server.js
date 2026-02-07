@@ -7,35 +7,45 @@ const wss = new WebSocketServer({
 
 const clients = new Map(); // client → { lastActive }
 
-function broadcastPresence() {
-    const now = Date.now();
-    let online = 0;
-    let idle = 0;
+function broadcastPresence(room) {
+  const now = Date.now();
+  let online = 0, idle = 0;
 
-    for (const { lastActive } of clients.values()) {
-        const diff = now - lastActive;
-        if (diff < 30_000) online++;
-        else idle++;
+  for (const [ws, info] of clients.entries()) {
+    if (info.room !== room) continue;
+    const diff = now - info.lastActive;
+    if (diff < 30000) online++;
+    else idle++;
+  }
+
+  const msg = JSON.stringify({ online, idle, room });
+
+  for (const [ws, info] of clients.entries()) {
+    if (info.room === room && ws.readyState === ws.OPEN) {
+      ws.send(msg);
     }
-
-    console.log("Broadcasting:", { online, idle });
-
-    const msg = JSON.stringify({ online, idle });
-
-    for (const ws of clients.keys()) {
-        if (ws.readyState === ws.OPEN) ws.send(msg);
-    }
+  }
 }
 
 
-wss.on("connection", ws => {
-    clients.set(ws, { lastActive: Date.now() });
 
-    ws.on("message", msg => {
-        if (msg.toString() === "active") {
-            clients.get(ws).lastActive = Date.now();
-        }
+wss.on("connection", ws => {
+    clients.set(ws, { lastActive: Date.now(), room });
+
+    ws.on("message", raw => {
+    const msg = JSON.parse(raw);
+
+    if (msg.type === "switch-room") {
+        clients.get(ws).room = msg.room;
+        clients.get(ws).lastActive = Date.now();
+        broadcastPresence(msg.room);
+    }
+
+    if (msg.type === "active") {
+        clients.get(ws).lastActive = Date.now();
+    }
     });
+
 
     ws.on("close", () => {
         clients.delete(ws);

@@ -12,7 +12,7 @@ async function fetchDirectoryListing(path) {
     const parser = new DOMParser();
     const doc = parser.parseFromString(html, "text/html");
 
-    const base = "/" + path.replace(/\/$/, ""); // "/assets/notesets"
+    const base = "/" + path.replace(/\/$/, ""); 
 
     const links = [...doc.querySelectorAll("a")]
         .map(a => a.getAttribute("href"))
@@ -38,23 +38,28 @@ async function loadClasses() {
     `;
 
     classDirs.forEach(dir => {
-        const name = dir.replace("notes/", "");
+        const name = dir.replace("/", "");
 
         const item = document.createElement("div");
         item.className = "noteset-item";
         item.textContent = name;
 
         item.onclick = () => {
-            history.pushState({}, "", `/${name}` + encodeURIComponent(name));
-            loadNotesets(name);
+            history.pushState({}, "", `/?class=${encodeURIComponent(name)}`);
+            routeFromURL();
         };
+
 
         document.getElementById("main-container").appendChild(item);
     });
+
+    document.getElementById("reveal-toggle").style.display = "none";
+    document.getElementById("reveal-toggle").style.display = "none";
 }
 
-async function loadNotesets(className) {
-    const notesetDirs = await fetchDirectoryListing(`notes/${className}/`);
+async function loadNotesets(className) { 
+    const files = await fetchDirectoryListing(`notes/${className}/`); 
+    const notesetDirs = files .filter(f => f.endsWith(".md")) .map(f => f.replace(".md", ""));
 
     const container = document.getElementById("content");
     container.innerHTML = `
@@ -71,18 +76,26 @@ async function loadNotesets(className) {
         item.textContent = name;
 
         item.onclick = () => {
-            history.pushState({}, "", "/?noteset=" + encodeURIComponent(name));
-            loadNoteset(name);
+            history.pushState(
+                {},
+                "",
+                `/?class=${encodeURIComponent(className)}&noteset=${encodeURIComponent(name)}`
+            );
+            routeFromURL();
         };
+
 
 
 
         document.getElementById("main-container").appendChild(item);
     });
 
+    document.getElementById("presence-indicator").style.display = "flex";
+    document.getElementById("reveal-toggle").style.display = "none";
+    setupPresence(className);
 }
 
-function buildNotesetUI(name) {
+function buildNotesetUI(name, className) {
     const container = document.getElementById("content");
 
     container.innerHTML = `
@@ -94,35 +107,21 @@ function buildNotesetUI(name) {
     `;
 
     document.querySelector(".back-button").onclick = () => {
-        history.pushState({}, "", "/");
-        loadNotesets();
+        history.pushState({}, "", `/?class=${encodeURIComponent(className)}`);
+        loadNotesets(className);
     };
+
 
 
     return container;
 }
 
 const notesCache = new Map();
-async function loadMarkdownFiles(name) {
-    if (notesCache.has(name)) {
-        return notesCache.get(name);
-    }
-
-    const notes = await fetchDirectoryListing(`${ROOT}${name}/`);
-    const mdFiles = notes
-        .filter(n => n.endsWith(".md"))
-        .sort((a, b) => b.localeCompare(a));
-
-    const results = [];
-
-    for (const file of mdFiles) {
-        const md = await fetch(`${ROOT}${name}/${file}`).then(r => r.text());
-        results.push({ file, md });
-    }
-
-    notesCache.set(name, results);
-    return results;
+async function loadMarkdownFiles(notesetName, className) {
+  const md = await fetch(`/notes/${className}/${notesetName}.md`).then(r => r.text());
+  return [{ file: `${notesetName}.md`, md }];
 }
+
 
 function transformMarkdown(html) {
     html = html.replace(/\{\{(.*?)\}\}/g, (_, p1) =>
@@ -157,11 +156,10 @@ function applyCollapsibleBehavior(header, content) {
     };
 }
 
-async function loadNoteset(name) {
-    const container = buildNotesetUI(name);
+async function loadNoteset(name, className) {
+    const container = buildNotesetUI(name, className);
 
-    const files = await loadMarkdownFiles(name);
-
+    const files = await loadMarkdownFiles(name, className);
     document.querySelector("#loading-message").remove();
 
     for (const { file, md } of files) {
@@ -189,6 +187,9 @@ async function loadNoteset(name) {
             hljs.highlightElement(block);
         });
     }
+
+    document.getElementById("reveal-toggle").style.display = "flex";
+    setupRevealToggle();
 }
 
 function setupRevealToggle() {
@@ -215,25 +216,30 @@ function setupRevealToggle() {
 }
 
 function routeFromURL() {
-  const path = window.location.pathname.split("/").filter(Boolean);
+  const params = new URLSearchParams(window.location.search);
+  const className = params.get("class");
+  const noteset = params.get("noteset");
 
-  if (path.length === 0) {
+  if (!className) {
+    // homepage: list all classes
+    setupPresence("home");
     loadClasses();
     return;
   }
 
-  if (path.length === 1) {
-    const className = path[0];
+  if (!noteset) {
+    // class page: list notesets
+    setupPresence(className);
     loadNotesets(className);
     return;
   }
 
-  if (path.length === 2) {
-    const [className, noteset] = path;
-    loadNoteset(className, noteset);
-    return;
-  }
+  // noteset page
+  setupPresence(className);
+  loadNoteset(className, noteset);
 }
+
+
 
 
 
