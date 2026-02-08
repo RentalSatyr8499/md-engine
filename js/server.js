@@ -110,3 +110,7 @@ setInterval(broadcastPresence, 10000);
 server.listen(port, host, () => {
   console.log(`Server listening on ${port}`);
 });
+
+console.log("dirname:", __dirname);
+console.log("root:", root);
+console.log("notes exists:", fs.existsSync(path.join(root, "notes")));
