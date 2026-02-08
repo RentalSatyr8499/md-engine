@@ -18,7 +18,7 @@ function setupPresence(room) {
 
   ws = new WebSocket(
     location.hostname === "localhost"
-      ? "ws://localhost:8080"
+      ? "ws://localhost:3000/ws"
       : "wss://probable-tribble.fly.dev/ws"
   );
 
