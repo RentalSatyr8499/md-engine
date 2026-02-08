@@ -13,9 +13,6 @@ const root = path.join(__dirname, ".."); // project root
 // ------------------------------
 // STATIC FILE SERVER
 // ------------------------------
-const fs = require("fs");
-const path = require("path");
-
 function serveStatic(req, res) {
   let reqPath = req.url;
   if (reqPath === "/") reqPath = "/index.html";
@@ -55,6 +52,13 @@ function serveStatic(req, res) {
   });
 }
 
+
+const server = http.createServer((req, res) => {
+  // Let WebSocket upgrades bypass static handling
+  if (req.url.startsWith("/ws")) return;
+
+  serveStatic(req, res);
+});
 
 // ------------------------------
 // WEBSOCKET PRESENCE SERVER
@@ -113,7 +117,3 @@ setInterval(broadcastPresence, 10000);
 server.listen(port, host, () => {
   console.log(`Server listening on ${port}`);
 });
-
-console.log("dirname:", __dirname);
-console.log("root:", root);
-console.log("notes exists:", fs.existsSync(path.join(root, "notes")));
