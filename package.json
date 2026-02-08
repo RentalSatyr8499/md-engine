@@ -5,5 +5,8 @@
   "type": "module",
   "scripts": {
     "start": "node js/server.js"
+  },
+  "devDependencies": {
+    "@flydotio/dockerfile": "^0.7.10"
   }
 }

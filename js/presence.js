@@ -4,7 +4,6 @@ let lastActivity = Date.now();
 
 function setupPresence(room) {
   if (ws && ws.readyState === WebSocket.OPEN) {
-    // Just switch rooms
     ws.send(JSON.stringify({ type: "switch-room", room }));
     return;
   }
@@ -17,11 +16,10 @@ function setupPresence(room) {
     return;
   }
 
-  // Otherwise create a new connection
   ws = new WebSocket(
     location.hostname === "localhost"
       ? "ws://localhost:8080"
-      : "wss://your-app-name.fly.dev"
+      : "wss://probable-tribble.fly.dev"
   );
 
   ws.onopen = () => {

@@ -10,13 +10,12 @@ async function fetchDirectoryListing(path) {
     const links = [...doc.querySelectorAll("a")]
         .map(a => a.getAttribute("href"))
         .filter(href => href && href !== "../")
-        .filter(href => href.startsWith(base + "/")) // must be inside this directory
+        .filter(href => href.startsWith(base + "/")) 
         .filter(href => {
-            // Count segments to ensure it's exactly one level deeper
-            const rel = href.slice(base.length + 1); // remove "/assets/notesets/"
+            const rel = href.slice(base.length + 1); 
             return rel.split("/").filter(Boolean).length === 1;
         })
-        .map(href => href.slice(base.length + 1)); // return just "Part 1/"
+        .map(href => href.slice(base.length + 1)); 
 
     return links;
 }
@@ -49,7 +48,6 @@ async function loadMarkdownFiles(name, className) {
     }
 
     const notes = await fetchDirectoryListing(`notes/${className}/notesets/${name}/`);
-    console.log(`searching notes/${className}/notesets/${name}/ for .md files`);
     const mdFiles = notes
         .filter(n => n.endsWith(".md"))
         .sort((a, b) => b.localeCompare(a));
@@ -66,19 +64,15 @@ async function loadMarkdownFiles(name, className) {
     return results;
 }
 
-function transformMarkdown(html) {
-    // 1. Replace {{answer}} with blanks
+function transformMarkdown(html, className, notesetName) {
     html = html.replace(/\{\{(.*?)\}\}/g, (_, p1) =>
         `<span class="blank" onclick="this.classList.toggle('show')">${p1}</span>`
     );
 
-    // 2. Superscripts: x^2 → x<sup>2</sup>
     html = html.replace(/(\S)\^(\S+)/g, (m, base, sup) => `${base}<sup>${sup}</sup>`);
 
-    // 3. Subscripts: x_2 → x<sub>2</sub>
     html = html.replace(/(\S)_(\S+)/g, (m, base, sub) => `${base}<sub>${sub}</sub>`);
 
-    // 4. Escape HTML inside code blocks
     html = html.replace(
         /<pre><code[^>]*>([\s\S]*?)<\/code><\/pre>/g,
         (match, code) => {
@@ -89,8 +83,16 @@ function transformMarkdown(html) {
         }
     );
 
+    html = html.replace(/<img[^>]+src="([^"]+)"[^>]*>/g, (match, src) => {
+        if (/^https?:\/\//i.test(src)) return match;
+        const filename = src.split("/").pop().replace(/^\.\//, "");
+        const resolved = `notes/${className}/assets/${filename}`;
+        return match.replace(src, resolved);
+    });
+
     return html;
 }
+
 
 
 function applyCollapsibleBehavior(header, content) {

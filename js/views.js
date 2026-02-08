@@ -21,7 +21,6 @@ async function loadClasses() {
 
 
         document.getElementById("main-container").appendChild(item);
-        console.log(`added class ${dir}`)
     });
 
     document.getElementById("reveal-toggle").style.display = "none";
@@ -56,7 +55,6 @@ async function loadNotesets(className) {
         };
 
         document.getElementById("main-container").appendChild(item);
-        console.log(`added noteset ${dir}`)
 
     });
 
@@ -86,10 +84,9 @@ async function loadNoteset(name, className) {
 
         container.appendChild(header);
         container.appendChild(content);
-        console.log(`added noteset ${file}`)
 
         let html = marked.parse(md);
-        html = transformMarkdown(html);
+        html = transformMarkdown(html, className, name);
 
         content.innerHTML = html;
 
