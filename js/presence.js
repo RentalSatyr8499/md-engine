@@ -41,16 +41,4 @@ function updatePresenceUI(online, idle) {
     document.getElementById("numIdle").textContent = `${idle}`;
 }
 
-ws.onopen = () => {
-    console.log("WS connected");
-};
-
-ws.onerror = err => {
-    console.error("WS error", err);
-};
-
-ws.onclose = () => {
-    console.warn("WS closed");
-};
-
 
