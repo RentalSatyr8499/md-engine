@@ -19,7 +19,7 @@ function setupPresence(room) {
   ws = new WebSocket(
     location.hostname === "localhost"
       ? "ws://localhost:8080"
-      : "wss://probable-tribble.fly.dev"
+      : "wss://probable-tribble.fly.dev/ws"
   );
 
   ws.onopen = () => {

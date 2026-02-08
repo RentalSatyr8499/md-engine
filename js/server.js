@@ -1,11 +1,14 @@
+import http from "http";
 import { WebSocketServer } from "ws";
 
-const wss = new WebSocketServer({
-    port: process.env.PORT || 3000,
-    host: "0.0.0.0"
-});
+const port = process.env.PORT || 3000;
+const host = "0.0.0.0";
+console.log(`port: ${port}`);
+const server = http.createServer();
 
-const clients = new Map(); // client → { lastActive }
+const wss = new WebSocketServer({ server, path: "/ws" });
+
+const clients = new Map();
 
 function broadcastPresence(room) {
   const now = Date.now();
@@ -27,54 +30,33 @@ function broadcastPresence(room) {
   }
 }
 
-
-
 wss.on("connection", ws => {
-    clients.set(ws, { lastActive: Date.now(), room: null });
+  clients.set(ws, { lastActive: Date.now(), room: null });
 
-    ws.on("message", raw => {
+  ws.on("message", raw => {
     const msg = JSON.parse(raw);
 
     if (msg.type === "switch-room") {
-        clients.get(ws).room = msg.room;
-        clients.get(ws).lastActive = Date.now();
-        broadcastPresence(msg.room);
+      clients.get(ws).room = msg.room;
+      clients.get(ws).lastActive = Date.now();
+      broadcastPresence(msg.room);
     }
 
     if (msg.type === "active") {
-        clients.get(ws).lastActive = Date.now();
+      clients.get(ws).lastActive = Date.now();
     }
-    });
+  });
 
-
-    ws.on("close", () => {
-        clients.delete(ws);
-        broadcastPresence();
-    });
-
+  ws.on("close", () => {
+    clients.delete(ws);
     broadcastPresence();
+  });
+
+  broadcastPresence();
 });
 
-// Broadcast every 10 seconds
-setInterval(broadcastPresence, 10_000);
+setInterval(broadcastPresence, 10000);
 
-console.log("WebSocket presence server running");
-
-wss.on("connection", ws => {
-    console.log("Client connected");
-
-    ws.on("message", msg => {
-        console.log("Received:", msg.toString());
-        if (msg.toString() === "active") {
-            clients.get(ws).lastActive = Date.now();
-        }
-    });
-
-    ws.on("close", () => {
-        console.log("Client disconnected");
-        clients.delete(ws);
-        broadcastPresence();
-    });
-
-    broadcastPresence();
+server.listen(port, host, () => {
+  console.log("Server listening on", port);
 });
