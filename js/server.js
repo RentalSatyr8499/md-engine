@@ -13,14 +13,24 @@ const root = path.join(__dirname, ".."); // project root
 // ------------------------------
 // STATIC FILE SERVER
 // ------------------------------
+const fs = require("fs");
+const path = require("path");
+
 function serveStatic(req, res) {
   let reqPath = req.url;
-
-  // Default to index.html for SPA routing
   if (reqPath === "/") reqPath = "/index.html";
 
   const filePath = path.join(root, reqPath);
 
+  // If it's a directory, return a listing
+  if (fs.existsSync(filePath) && fs.lstatSync(filePath).isDirectory()) {
+    const files = fs.readdirSync(filePath);
+    res.writeHead(200, { "Content-Type": "application/json" });
+    res.end(JSON.stringify(files));
+    return;
+  }
+
+  // Otherwise serve the file
   fs.readFile(filePath, (err, data) => {
     if (err) {
       res.writeHead(404);
@@ -28,7 +38,6 @@ function serveStatic(req, res) {
       return;
     }
 
-    // Basic content-type mapping
     const ext = path.extname(filePath);
     const types = {
       ".html": "text/html",
@@ -46,12 +55,6 @@ function serveStatic(req, res) {
   });
 }
 
-const server = http.createServer((req, res) => {
-  // Let WebSocket upgrades bypass static handling
-  if (req.url.startsWith("/ws")) return;
-
-  serveStatic(req, res);
-});
 
 // ------------------------------
 // WEBSOCKET PRESENCE SERVER
