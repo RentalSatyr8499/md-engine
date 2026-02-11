@@ -14,7 +14,8 @@ const root = path.join(__dirname, ".."); // project root
 // STATIC FILE SERVER
 // ------------------------------
 function serveStatic(req, res) {
-  let reqPath = decodeURIComponent(req.url);
+  const parsed = new URL(req.url, `http://${req.headers.host}`);
+  let reqPath = decodeURIComponent(parsed.pathname);
 
   if (reqPath === "/") reqPath = "/index.html";
 
