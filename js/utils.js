@@ -1,24 +1,34 @@
 async function fetchDirectoryListing(path) {
+    console.log("CLIENT DEBUG: requesting directory listing for:", path);
+
     const res = await fetch(path);
     const html = await res.text();
+
+    console.log("CLIENT DEBUG: raw HTML returned for", path, ":\n", html);
 
     const parser = new DOMParser();
     const doc = parser.parseFromString(html, "text/html");
 
-    const base = "/" + path.replace(/\/$/, ""); 
+    const base = "/" + path.replace(/\/$/, "");
+    console.log("CLIENT DEBUG: computed base =", base);
 
-    const links = [...doc.querySelectorAll("a")]
-        .map(a => a.getAttribute("href"))
+    const allHrefs = [...doc.querySelectorAll("a")].map(a => a.getAttribute("href"));
+    console.log("CLIENT DEBUG: all hrefs found:", allHrefs);
+
+    const links = allHrefs
         .filter(href => href && href !== "../")
-        .filter(href => href.startsWith(base + "/")) 
+        .filter(href => href.startsWith(base + "/"))
         .filter(href => {
-            const rel = href.slice(base.length + 1); 
+            const rel = href.slice(base.length + 1);
             return rel.split("/").filter(Boolean).length === 1;
         })
-        .map(href => href.slice(base.length + 1)); 
+        .map(href => href.slice(base.length + 1));
+
+    console.log("CLIENT DEBUG: final filtered links:", links);
 
     return links;
 }
+
 
 function buildNotesetUI(name, className) {
     const container = document.getElementById("content");

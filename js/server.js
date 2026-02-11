@@ -19,13 +19,25 @@ function serveStatic(req, res) {
 
   const filePath = path.join(root, reqPath);
 
+  // 🔥 DEBUG LINES
+  console.log("SERVER DEBUG: req.url =", req.url);
+  console.log("SERVER DEBUG: reqPath =", reqPath);
+  console.log("SERVER DEBUG: filePath =", filePath);
+  console.log("SERVER DEBUG: root =", root);
+  console.log("SERVER DEBUG: __dirname =", __dirname);
+
   // If it's a directory, return a listing
   if (fs.existsSync(filePath) && fs.lstatSync(filePath).isDirectory()) {
     const files = fs.readdirSync(filePath);
+
+    // 🔥 MORE DEBUG
+    console.log("SERVER DEBUG: directory listing for", filePath, "=", files);
+
     res.writeHead(200, { "Content-Type": "application/json" });
     res.end(JSON.stringify(files));
     return;
   }
+
 
   // Otherwise serve the file
   fs.readFile(filePath, (err, data) => {
