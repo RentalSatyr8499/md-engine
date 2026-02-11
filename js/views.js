@@ -7,6 +7,8 @@ async function loadClasses() {
         </div>
     `;
 
+    console.log(`loading the following class directories: ${classDirs}`)
+
     classDirs.forEach(dir => {
         const name = dir.replace("/", "");
 
