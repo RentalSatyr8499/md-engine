@@ -5,11 +5,11 @@ I built this engine that renders my class notes for school (.md files) into fill
 ## Software design highlights
 
 ### 😮 URL query parameters
-Instead of serving static files, the backend uses **query parameters** (ex. `?class=CS3130&noteset=Midterm1`) to dynamically render notes. This allows me to share URLS easily, reduce redunancy in my code, and render notes on-demand. All the noteset structures are driven by the noteset file system (the engine scans the directory independently to see what needs to be loaded). So no manifest is needed.
+Instead of serving static files, the backend uses query parameters (ex. `?class=CS3130&noteset=Midterm1`) to dynamically render notes. This allows me to share URLs easily and reduce redunancy in my code. All the noteset structures are driven by the noteset file system (the engine scans the directory independently to see what needs to be loaded). Whew, no `manifest.json` needed...
 
 ### 😮 Presence tracking
 This project uses a WebSocket-base presence system:
-- Shows **online** (active in last 60s) and **idle** counts
+- Shows online (active in last 60s) and idle counts
 - Tracks the number of people online in individual class notes (not collectively across the entire website). So the system also separates user presences by "rooms".
 
 ### 😮 .md rendering and other UI features
@@ -23,7 +23,7 @@ Other UI features:
 - **Collapsible sections**: headers can be clicked to expanded/collapsed using CSS animation
 
 ### 😮 Asset caching
-Markdown files are cached after the first load, reducing bandwidth and making navigation snappy even on slow connections.
+Markdown files are cached in a javascript `Map` after the first load, reducing bandwidth.
 
 ## Tech Stack
 - **Backend**: Node.js HTTP server with WebSocket support
@@ -57,16 +57,18 @@ then it should tell you what the localhost address is you can see the current si
 
 ### Add Notes
 So here's how MDengine works: one .md file corresponds to a *note*. *Notes* in turn belong to a *noteset*, and finally *notesets* belong to a *class* (like a course). I added the noteset layer so that you can organize class notes by unit or midterm.
-1. Create folders under `notes/`. In the project root:
+1. The first step is to create folders under `notes/`. In the project root:
    ```
    mkdir notes/[class-name]/notesets/[noteset-name]
    mkdir notes/[class-name]/assets
    ```
-2. Add markdown files with numeric prefixes (e.g., `01 intro.md`, `02 building.md`). Notes will appear in the reverse order of their numbering (so most recent notes are at the top). Custom markdown features you can use:
-- Enclose a phrase in {{}} to make it fill-in-the-blank.
+2. All you need to do next is add markdown files with numeric prefixes (e.g., `01 intro.md`, `02 building.md`). Notes will appear in the reverse order of their numbering (so most recent notes are at the top). Custom markdown features you can use:
+- Enclose a phrase in `{{}}` to make it fill-in-the-blank.
 - Use `^` for superscript and `_` for subscript.
 - Encode content in three backticks (\`\`\`\n) for a code block, and one backtick (\`) for inline code.
 - Place images in the assets folder and simply put their actual name as the path. The path will resolve automatically for you.
+
+All done! No manifest needed because the engine scans the directory for you.
 
 ### Deployment
 Run `fly launch` in the console, and make sure to use the existing `fly.toml` and `package.json`. Everything should already be configured for stuff to work on fly for you. Happy MDengining!
