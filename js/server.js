@@ -28,15 +28,18 @@ function serveStatic(req, res) {
 
   // If it's a directory, return a listing
   if (fs.existsSync(filePath) && fs.lstatSync(filePath).isDirectory()) {
-    const files = fs.readdirSync(filePath);
+  const files = fs.readdirSync(filePath);
 
-    // 🔥 MORE DEBUG
-    console.log("SERVER DEBUG: directory listing for", filePath, "=", files);
+  // Return HTML like npx serve does
+  const html = files
+    .map(f => `<a href="${reqPath}${reqPath.endsWith("/") ? "" : "/"}${f}">${f}</a>`)
+    .join("<br>");
 
-    res.writeHead(200, { "Content-Type": "application/json" });
-    res.end(JSON.stringify(files));
-    return;
-  }
+  res.writeHead(200, { "Content-Type": "text/html" });
+  res.end(html);
+  return;
+}
+
 
 
   // Otherwise serve the file
