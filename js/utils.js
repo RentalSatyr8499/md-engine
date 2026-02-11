@@ -135,24 +135,32 @@ function setupRevealToggle() {
 }
 
 function routeFromURL() {
-  const params = new URLSearchParams(window.location.search);
-  const className = params.get("class");
-  const noteset = params.get("noteset");
 
-  if (!className) {
-    setupPresence("home");
-    loadClasses();
-    return;
-  }
+    console.log("routing from URL...")
+    const params = new URLSearchParams(window.location.search);
+    const className = params.get("class");
+    const noteset = params.get("noteset");
 
-  if (!noteset) {
+    if (!className) {
+        console.log("loading homepage...");
+        loadClasses();
+        console.log("homepage loaded!...");
+        return;
+    }
+
+    if (!noteset) {
+        console.log("loading class page...");
+        setupPresence(className);
+        loadNotesets(className);
+        console.log("class page loaded!...");
+        return;
+    }
+
+    console.log("loading noteset...");
     setupPresence(className);
-    loadNotesets(className);
-    return;
-  }
+    loadNoteset(noteset, className);
+    console.log("noteset loaded!...");
 
-  setupPresence(className);
-  loadNoteset(noteset, className);
 }
 
 
