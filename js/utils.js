@@ -69,14 +69,23 @@ async function loadMarkdownFiles(name, className) {
 }
 
 function transformMarkdown(html, className, notesetName) {
+    // 1. Replace {{answer}} with blanks
     html = html.replace(/\{\{(.*?)\}\}/g, (_, p1) =>
         `<span class="blank" onclick="this.classList.toggle('show')">${p1}</span>`
     );
 
-    html = html.replace(/(\S)\^(\S+)/g, (m, base, sup) => `${base}<sup>${sup}</sup>`);
+    // 2. Handle math blocks: $...$
+    html = html.replace(/\$(.+?)\$/g, (_, expr) => {
+        // superscript: x^{y}
+        expr = expr.replace(/(\S)\^\{([^}]+)\}/g, (m, base, sup) => `${base}<sup>${sup}</sup>`);
 
-    html = html.replace(/(\S)_(\S+)/g, (m, base, sub) => `${base}<sub>${sub}</sub>`);
+        // subscript: x_{y}
+        expr = expr.replace(/(\S)_\{([^}]+)\}/g, (m, base, sub) => `${base}<sub>${sub}</sub>`);
 
+        return `<span class="math">${expr}</span>`;
+    });
+
+    // 3. Escape HTML inside code blocks
     html = html.replace(
         /<pre><code[^>]*>([\s\S]*?)<\/code><\/pre>/g,
         (match, code) => {
@@ -87,15 +96,35 @@ function transformMarkdown(html, className, notesetName) {
         }
     );
 
-    html = html.replace(/<img[^>]+src="([^"]+)"[^>]*>/g, (match, src) => {
-        if (/^https?:\/\//i.test(src)) return match;
-        const filename = src.split("/").pop().replace(/^\.\//, "");
-        const resolved = `notes/${className}/assets/${filename}`;
-        return match.replace(src, resolved);
-    });
+    // 4. Rewrite image paths + detect size parameter
+    html = html.replace(
+    /<img([^>]+)src="([^"]+)"([^>]*)>\s*\{size=(small|medium|large)\}/g,
+    (match, before, src, after, size) => {
+        const sizeClass = `img-size-${size}`;
+
+        // resolve relative paths
+        if (!/^https?:\/\//i.test(src)) {
+            const filename = src.split("/").pop().replace(/^\.\//, "");
+            src = `notes/${className}/assets/${filename}`;
+        }
+
+        return `<img class="${sizeClass}" ${before}src="${src}"${after}>`;
+    }
+    );
+
+
+    // 5. Hide empty bullets
+     html = html.replace(
+        /<li>\s*<ul>[\s\S]*?<\/ul>\s*<\/li>/g,
+        match => match.replace("<li>", `<li class="empty-li">`)
+    );
+
+
 
     return html;
 }
+
+
 
 
 

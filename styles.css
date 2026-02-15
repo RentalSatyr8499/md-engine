@@ -200,3 +200,12 @@ button {
     transition: height 0.3s ease;
 }
 
+.img-small  { width: 30vw; }
+.img-medium { width: 50vw; }
+.img-large  { width: 80vw; }
+
+li.empty-li::marker {
+    color: transparent;
+}
+
+
