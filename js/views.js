@@ -1,4 +1,5 @@
 async function loadClasses() {
+    document.title = "MD Engine";
     const classDirs = await fetchDirectoryListing("notes/");
     const container = document.getElementById("content");
     container.innerHTML = `
@@ -30,6 +31,8 @@ async function loadClasses() {
 }
 
 async function loadNotesets(className) { 
+    document.title = `${className}: notesets`;
+
     const notesetDirs = await fetchDirectoryListing(`notes/${className}/notesets/`); 
     
 
@@ -66,6 +69,7 @@ async function loadNotesets(className) {
 }
 
 async function loadNoteset(name, className) {
+    document.title = `${className} | ${name}`;
     const container = buildNotesetUI(name, className);
 
     const files = await loadMarkdownFiles(name, className);
@@ -97,6 +101,7 @@ async function loadNoteset(name, className) {
         });
     }
 
+    document.getElementById("presence-indicator").style.display = "flex";
     document.getElementById("reveal-toggle").style.display = "flex";
     setupRevealToggle();
 }

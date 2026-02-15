@@ -1,6 +1,3 @@
-- implement image sizes
 - presence indicator doesn't show up sometimes
 - collapse/expand all headers
-- spacing for tables
-- make parent bullet invisible if it has no content
-- fix latex stuff
+- dynamic OG tags

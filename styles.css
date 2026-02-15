@@ -83,7 +83,7 @@ button {
 
 .note-content img {
     display: block; 
-    max-width: 35vw; 
+    max-width: 100%;
     height: auto;   
     margin: 20px auto; 
     object-fit: contain; 
@@ -197,12 +197,21 @@ button {
 .collapsible-content {
     overflow: hidden;
     height: 0;
+    padding-left: 1rem;
     transition: height 0.3s ease;
 }
 
-.img-small  { width: 30vw; }
-.img-medium { width: 50vw; }
-.img-large  { width: 80vw; }
+.img-size-small  { 
+    width: 30%; 
+    min-width: 100px;
+}
+.img-size-medium { 
+    width: 65%; 
+    min-width: 300px;
+}
+.img-size-large  { 
+    width: 100%; 
+}
 
 li.empty-li::marker {
     color: transparent;

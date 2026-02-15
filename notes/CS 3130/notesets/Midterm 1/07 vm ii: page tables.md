@@ -23,7 +23,7 @@
     6. Assemble the physical address. Begin with the {{PPN}}, then  concatenate the {{page offset}} (which is found in {{the remaining bits in the virtual address}}). Pad the physical address with zeroes as needed. Ex. `0b111 001` becomes `0b0011 1001`, which is `0x39` in hex.
     7. Translate the physical address to hex if needed, then look in memory to see what is stored there. Ex. The value stored at `0x39` is `0x0C`.
 * Exercise: assuming the same memory state, translate the following virtual addresses: 
-![alt text](image3.png)
+![alt text](image3.png){size=medium}
 *   * `0x12`: {{`0xBA`}}
     * `0x12`, except PTEs are 2 bytes and contain 12 unused bits: {{`0x3C`}}
 
@@ -34,7 +34,7 @@ because they have to do with an assignment due after the midterm
     * Each deeper layer of the tree represents {{a narrower and narrower range of virtual addresses}}.
     * This solves the problem of storing unused pages because {{if a range of addresses is invalid, an earlier node will prevent every single one of those entries from being stored}}. This is called a multi-level page table.
 
-![alt text](image4.png)
+![alt text](image4.png){size=large}
 
 *   
     * We know which node to look at next when traversing a multi-level page table by looking at the {{VPN}}.
@@ -58,7 +58,7 @@ because they have to do with an assignment due after the midterm
         * Hint 2: {{The number of entries in a table is how many bits a table needs to be represented as a VPN index. In this example, 12 of the 64 bits in the virt. address are taken up by the page offset. The remaining 52 can be used for VPN indices.}}
     * 16384-byte pages? {{4 levels}}
 * Exercise:
-![alt text](image5.png)
+![alt text](image5.png){size=medium}
 * 
     * Translate virtual address `0x129`: {{`0x0A`}}.
         * Hint 1: First, determine how many {{levels}} there are: {{3}}-bit PPN + {{1}} valid bit + {{3}}-bit page offset = 7-bit {{PTE}}s. That means each PTE is {{1}} byte, giving us {{8}} page table entries per {{page or page table}}. So each VPN index will eat up {{3}} bits. Because the {{page offset}} already takes up 3 bits of the virtual address, we can conclude there are {{2}} levels.
