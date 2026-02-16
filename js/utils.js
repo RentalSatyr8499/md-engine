@@ -54,7 +54,7 @@ async function loadMarkdownFiles(name, className) {
     const notes = await fetchDirectoryListing(`notes/${className}/notesets/${name}/`);
     const mdFiles = notes
         .filter(n => n.endsWith(".md"))
-        .sort((a, b) => b.localeCompare(a));
+        .sort((a, b) => a.localeCompare(b));
 
     const results = [];
 
