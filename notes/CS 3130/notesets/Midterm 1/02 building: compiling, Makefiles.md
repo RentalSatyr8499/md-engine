@@ -1,4 +1,5 @@
-| file extension | description | language |
+* Fill in the blank!
+| file extension | what is it used for? | language |
 |----------|----------|----------|
 | `.c`    | {{C source code}}   | {{C}}   |
 | `.h`    | {{C header file}}   |  {{C}}   |
@@ -13,9 +14,9 @@
 | `.dll`   | {{dynamically linked library}}   | binary   |
 | `.dylib`   | {{dynamically linked library}}   |  binary   |
 
-* Define static libraries: {{"embedded into an executable when it is linked"}}. The steps to using a static library are: 
-    1. Create it using `ar rcs`. For example, if the name of your library is `foo`, and it includes `file1.o` and `file2.o`, the command would be: `ar rcs {{libfoo.a}} {{file1.o file2.o}}`.
-    2. Use it when compiling your executable, for example, if the name of your library is `foo`, and it's located at `-L/path/to/lib`, the compilation command for your program would look like: `clang -o myProgram {{-L/path/to/lib}} {{-lfoo}}`. 
+* Define "static library": {{functions "embedded into an executable when it is linked"}}. The steps to using a static library are: 
+    1. Create it using {{`ar rcs`}}. For example, if the name of your library is `foo`, and it includes `file1.o` and `file2.o`, the command would be: `ar rcs {{libfoo.a}} {{file1.o file2.o}}`.
+    2. When {{compiling your executable}}, put it in the command. For example, if the name of your library is `foo`, and it's located at `-L/path/to/lib`, the compilation command for your program would look like: `clang -o myProgram {{-L/path/to/lib}} {{-lfoo}}`. 
         * You don't need the path if {{the standard library is in the standard location}}.
 * Define dynamic libraries: {{"loaded from the library file while an executable is running"}}. The steps to using a dynamic library are: 
     1. Compile `.o` files with {{`-fPIC`}}. For example, if your library includes `file1.o` and `file2.o`, you'd need to compiled both of those with {{`-fPIC`}}.

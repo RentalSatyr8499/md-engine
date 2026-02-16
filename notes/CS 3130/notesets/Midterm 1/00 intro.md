@@ -7,12 +7,19 @@
         * A core is {{a hardware execution engine inside the CPU}}.
         * A thread is {{a sequence of instructions within a program that the core can run}}.
 * {{Permissions}} determine which files, directories, and system operations a user or program is allowed to access.
-* Layered network model (I don't really think we need to know this yet but it's in the intro slides):
-    * Application layer: protocols like HTTP, SSH, SMTP; defines application‑level meaning.
-    * Transport layer: TCP/UDP; ensures data reaches the correct program and may provide reliability or streams.
-    * Network layer: IPv4/IPv6; ensures data reaches the correct machine across networks.
-    * Link layer: Ethernet/Wi‑Fi; coordinates access to the shared medium (wire or radio).
-    * Physical layer: encodes bits onto the wire or radio.
+* Layered network model (this was in the intro slides and there were past exam questions on it...):
+
+| layer | function | examples |
+|----------|----------|----------|
+| application    | {{defines app‑level data meaning}}   | {{HTTP, SSH, SMTP}}   |
+| transport    | {{ensures data reaches the correct program and may provide reliability or streams}}   | {{TCP, UDP }}  |
+| network    | {{ensures data reaches the correct machine across networks}}   | {{IPv4, IPv6}}  |
+| link    | {{coordinates access to the shared medium (wire or radio)}}   | {{Ethernet, Wi‑Fi}}  |
+| physical    | {{encodes bits onto the wire or radio}}   | {{copper wire, bluetooth}}  |
+
+*  
+    * DNS is a naming system that maps {{human-readable names}} (ex. www.virginia.edu) to {{machine-usable IP addresses}} (ex. 128.143.22.36).
+    * {{DHCP}} gives your machine an IP address (and other config).
 * {{Caching}} is an optimization where the CPU keeps data in faster/closer storage so it doesn’t have to wait for slow main memory.
 * Sometimes, adding more independent instructions (ex. two `add` instructions per loop instead of one) actually does not increase runtime.
 * Memory grows {{down}}wards in memory.

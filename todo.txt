@@ -1,3 +1,7 @@
-- presence indicator doesn't show up sometimes
 - collapse/expand all headers
 - dynamic OG tags
+- shuffle table
+- hide blank length
+- bug where l2 bullets (under empty l1 bullets) dont show up after tables or code blocks
+- description for class 
+- description for noteset (inherited first part from class)

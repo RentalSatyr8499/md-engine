@@ -63,8 +63,7 @@ because they have to do with an assignment due after the midterm
     * Translate virtual address `0x129`: {{`0x0A`}}.
         * Hint 1: First, determine how many {{levels}} there are: {{3}}-bit PPN + {{1}} valid bit + {{3}}-bit page offset = 7-bit {{PTE}}s. That means each PTE is {{1}} byte, giving us {{8}} page table entries per {{page or page table}}. So each VPN index will eat up {{3}} bits. Because the {{page offset}} already takes up 3 bits of the virtual address, we can conclude there are {{2}} levels.
         * Hint 2: PTE 1 is at {{`0x24` (so it's `0xF4`)}}, and PTE 2 is at {{`0x3D` (so it's `0xDC`).}}
-* 
-    * 
+
 
 
 

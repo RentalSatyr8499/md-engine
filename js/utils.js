@@ -24,7 +24,7 @@ async function fetchDirectoryListing(path) {
 
 
 
-function buildNotesetUI(name, className) {
+async function buildNotesetUI(name, className) {
     const container = document.getElementById("content");
 
     container.innerHTML = `
@@ -32,18 +32,43 @@ function buildNotesetUI(name, className) {
             <img src="./assets/back.png" class="back-button" alt="Back" title="view all notesets">
             <h1>${name}</h1>
         </div>
+        <div id="noteset-description"></div>
         <p id="loading-message">Loading notes…</p>
     `;
 
+    // Back button
     document.querySelector(".back-button").onclick = () => {
         history.pushState({}, "", `/?class=${encodeURIComponent(className)}`);
         loadNotesets(className);
     };
 
+    // Fetch directory listing
+    const basePath = `notes/${className}/notesets/${name}/`;
+    const files = await fetchDirectoryListing(basePath);
 
+    // Look for desc.txt
+    const descFile = files.find(f => f.toLowerCase() === "desc.txt");
+
+    if (descFile) {
+        try {
+            const text = await fetch(basePath + descFile).then(r => r.text());
+
+            // Insert as plain text, escaped safely
+            const descEl = document.getElementById("noteset-description");
+            descEl.textContent = text;
+        } catch (err) {
+            // If something goes wrong, fail silently — nothing spooky.
+            console.error("Failed to load desc.txt:", err);
+        }
+    }
+    // If no desc.txt exists, we simply show nothing. No errors, no ghosts.
 
     return container;
 }
+
+
+
+
 
 const notesCache = new Map();
 async function loadMarkdownFiles(name, className) {

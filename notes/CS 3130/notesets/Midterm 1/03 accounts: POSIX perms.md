@@ -17,3 +17,13 @@
         * `sudo`'s owner is {{root aka user ID 0 aka the superuser}}. That means anyone who runs `sudo` runs it as {{root}}.
         * In general, setuid programs must be responsible for {{carefully checking which user invoked them}}.
 * Define "privilege escalation": {{vulnerabilities that allow a user or program to gain more privileges than intended}}.
+
+* Exerciseee: Which of the following is possible to achieve in theory using **user accounts**? (Even if OSes don't do it often, if it's still possible, select yes)
+| action | possible? | explanation |
+|--------|--------|--------|
+| limit which system calls may be used | {{possible}} | {{kernel can check UID and deny specific syscalls}} |
+| limit which peripheral devices can be accessed | {{yes}} | {{devices are files; file permissions restrict access}} |
+| limit which parts of an accessible file can be accessed | {{no!}} | {{permissions apply to whole files, not byte ranges}} |
+| limit which instructions can be run | {{not possible}} | {{CPU forbids privileged instructions for all user mode}} |
+| limit which files on a storage device can be accessed | {{possible}} | {{file permissions control per‑user file access}} |
+| limit how much memory can be malloced | {{possible!}} | {{per‑user resource limits (rlimits) can cap memory}} |

@@ -1,0 +1,4 @@
+hey guys this is a study guide for Sp26 Reiss + Campbell exam. lots of content taken from slides. i still need to go through and double check everything + incorporate stuff from some of the later readings so further changes will be made to the site. and ill prob add hard exam questions i find in past exams. if you see an error or something to add email me xaq7pj@virginia.edu
+
+repo: https://github.com/RentalSatyr8499/md-engine
+

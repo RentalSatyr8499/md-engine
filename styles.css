@@ -1,3 +1,5 @@
+
+
 body {
     font-family: system-ui, sans-serif;
     line-height: 1.6;
@@ -217,4 +219,11 @@ li.empty-li::marker {
     color: transparent;
 }
 
+#noteset-description {
+    margin-top: 0.5rem;
+    margin-bottom: 2rem;
+
+    color: #666;
+    font-size: .5rem;
+}
 

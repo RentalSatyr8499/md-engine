@@ -115,4 +115,19 @@ close(fd);
     * {{`open()` the file to/from which I/O will be piped}}
     * Call `dup2()`. The first parameter is the file descriptor that {{points towards the original file}}, and the second parameter is the file descriptor that {{should be rerouted to point towards the same file}}.
     * Finally, call {{`exec`}} to run whatever program you're trying to modify the I/O of. This only works because {{`exec` inherits the open file table of its parent process}}.
-# left off on 68
+* Sharing and unsharing seek pointers:
+    * How can you get two file descriptors to have two independent unshared seek pointers? {{Call `open()` twice on the same filename. You get two independent file descriptors, each with its own seek pointer}}.  
+    * How can you get two file descriptors to share one seek pointer? {{Duplicate a file descriptor using `dup2()`. The new descriptor shares the same underlying open file description, including the seek pointer.}}  
+
+* Exercise: In the code below, what is written to output.txt? {{`ABCD`}}
+```
+int fd = open("output.txt", O_WRONLY|O_CREAT|O_TRUNC, 0666);
+write(fd, "A", 1);
+dup2(STDOUT_FILENO, 100);
+dup2(fd, STDOUT_FILENO);
+write(STDOUT_FILENO, "B", 1);
+write(fd, "C", 1);
+close(fd);
+write(STDOUT_FILENO, "D", 1);
+write(100, "E", 1);
+```

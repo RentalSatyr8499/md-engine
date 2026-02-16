@@ -70,7 +70,7 @@ async function loadNotesets(className) {
 
 async function loadNoteset(name, className) {
     document.title = `${className} | ${name}`;
-    const container = buildNotesetUI(name, className);
+    const container = await buildNotesetUI(name, className);
 
     const files = await loadMarkdownFiles(name, className);
     document.querySelector("#loading-message").remove();
