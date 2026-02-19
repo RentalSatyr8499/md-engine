@@ -7,8 +7,8 @@
     * For example, `451` translates to {{user r--, group r-x, other --x}}.
     * `chmod` can set exact permissions. For example, if you wanted to give only the user permissions to read, write, and execute `myFile`, run {{`chmod 700 file`}} or {{`chmod u+rwx myFile`}}.
 * POSIX Access Control Lists ("ACL"s) allow more flexible rules than the basic user/group/other bits, because you can set perms for {{multiple different users and multiple different groups by name}}. We can modify ACLs using the  {{`setfacl -m`}} command. 
-    * For example, if I wanted to give user `mst3k` read and write permissions to `myFile`, I would run {{`setfacl -m u:mst3k:rx myFile`}}.
-    * For example, if I wanted to give group `lab_fall2019` read permissions to `myFile`, I would run {{`setfacl -m g:lab_fall2019:r`}}.
+    * For example, if I wanted to give user `mst3k` read and write permissions to `myFile`, I would run {{`setfacl -m u:mst3k:rw myFile`}}.
+    * For example, if I wanted to give group `lab_fall2019` read permissions to `myFile`, I would run {{`setfacl -m g:lab_fall2019:r myFile`}}.
     * For example, if I wanted to remove user `mst3k` from the permission list, I would run {{`setfacl -x u:mst3k`}}.
 * User ID 0 is special kind of user called the {{superuser}}. This user automatically {{has almost all permission checks}}.
     * Superuser is still user mode (not kernel mode)! Kernel mode is a hardware privilege level used only by the OS.

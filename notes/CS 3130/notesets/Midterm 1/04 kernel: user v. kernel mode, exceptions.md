@@ -51,7 +51,7 @@
 | method | can it trigger kernel mode? | reason |
 |--------|--------|--------|
 | interrupt | {{Y}} | h{{ardware interrupts always switch to kernel mode}} |
-| trap |  {{N}} | {{software exceptions (e.g., syscalls) enter kernel mode}} |
+| trap |  {{Y}} | {{software exceptions (e.g., syscalls) enter kernel mode}} |
 | non-privileged non-exceptional instruction | {{N}} | {{normal user instructions never cause kernel entry}} |
 | fault | {{Y}} | {{faults (page fault, divide-by-zero) trap into the kernel}} |
 
