@@ -17,14 +17,14 @@
 * Define "static library": {{functions "embedded into an executable when it is linked"}}. The steps to using a static library are: 
     1. Create it using {{`ar rcs`}}. For example, if the name of your library is `foo`, and it includes `file1.o` and `file2.o`, the command would be: `ar rcs {{libfoo.a}} {{file1.o file2.o}}`.
     2. When {{compiling your executable}}, put it in the command. For example, if the name of your library is `foo`, and it's located at `-L/path/to/lib`, the compilation command for your program would look like: `clang -o myProgram {{-L/path/to/lib}} {{-lfoo}}`. 
-        * You don't need the path if {{the standard library is in the standard location}}.
+        * You don't need the path if {{the static library is in the standard location}}.
 * Define dynamic libraries: {{"loaded from the library file while an executable is running"}}. The steps to using a dynamic library are: 
-    1. Compile `.o` files with {{`-fPIC`}}. For example, if your library includes `file1.o` and `file2.o`, you'd need to compiled both of those with {{`-fPIC`}}.
+    1. Compile `.o` files with {{`-fPIC`}}.
     2. Create the library using a normal C compiler and the {{`-shared`}} flag. For example, if the name of your library is `foo`, and it includes `file1.o` and `file2.o`, the command would be: `clang {{-shared}} -o {{libfoo.so}} {{file1.o file2.o}}`.
     3. To use your dynamic library, tell the compiler where to find it at compilation time. For example, if the name of your library is `foo`, and it's located at `-L/path/to/lib`, the compilation command for your program would look like: `clang -o exec main.o {{-L/path/to/lib}} {{-lfoo}}`.
     4. When *running* the executable, you must also tell it where to find the `.so` file. There are two ways to set the runtime path:
         * Specify an rpath at link time. For example, `clang -o exec main.o {{-Wl,-rpath,L/path/to/lib}}`
-        * Set the `LD_LIBRARY_PATH` environment variable before running the program.
+        * Set the {{`LD_LIBRARY_PATH` environment variable}} before running the program.
 
 Exercise:
 ```

@@ -6,7 +6,7 @@
     * {{`exit`, `kill`}}: process destruction
     * There's also `posix_spawn` which is rarely used, but can be used to spawn new programs.
 * When `fork` is called, it's returned twice. Once in the {{parent}} process, where the return value is {{the child's pid}} and again in the {{child}} process, where the return value is {{zero}}.
-    * Everything (eg. {{memory}}, {{file descriptors}}, {{registers}}) is duplicated from the parent to the child, EXCEPT {{pid}}.
+    * Everything is duplicated from the parent to the child (eg. {{memory}}, {{file descriptors}}, {{registers}}), EXCEPT for {{pid}}.
 
 ```
 int main() {
@@ -43,10 +43,10 @@ The two possible outputs are: (1) {{`1 2 \n 3 4`}} and (2) {{`3 4 \n 1 2`}}
     * `*path`: {{new program to run}}
     * `*argv`: array of {{arguments (as strings) including program name}}, terminated by {{`NULL`}}
     * if `execv` is succesful, it {{does not return (to the original process that called it)}}.
-    * while `exec` creates new {{memory (stack, heap, data from .exe)}} for the running process, other data like {{file descriptors}} are copied from the old process.
+    * while `exec` creates new {{memory (stack, heap, etc.)}} for the running process, other data like {{file descriptors}} are copied from the old process.
 * "wait": `pid_t waitpid(pid_t pid, int *status, int options)`
     * `pid`: {{child process for which the main process waits}}. If `pid == -1`, then {{wait for any child process}}.
-    * `*status`: pointer to which {{status information}} is stored. We can interpret this information using macros from `sys/wait.h`:
+    * `*status`: pointer to which {{status information}} is stored. We can interpret `*status` using macros from `sys/wait.h`:
         * `WIFEXITED(status)`: true if {{process exited or returned}}, false otherwise
         * `WIFSIGNALED(status)`: true if {{process killed by signal}}, false otherwise
         * `WTERMSIG(status)`: returns the {{signal by which the process was killed}}.
@@ -67,7 +67,7 @@ int main() {
     }
 }
 ```
-Assuming fork and execv do not fail, the possible outputs are {{`L1 \n L2`}} and {{`L2 \n L1`}}.
+Assuming `fork` and `execv` do not fail, the possible outputs are {{`L1 \n L2`}} and {{`L2 \n L1`}}.
 
 
 ```
@@ -84,7 +84,7 @@ int main() {
     printf("2\n"); fflush(stdout);
 }
 ```
-Assuming fork and execv do not fail, the possible outputs are {{`0 \n 0 \n 1 \n 2`}}, {{`0 \n 1 \n 0 \n 2`}} and {{`1 \n 0 \n 0 \n 2`}}.
+Assuming `fork` and `execv` do not fail, the possible outputs are {{`0 \n 0 \n 1 \n 2`}}, {{`0 \n 1 \n 0 \n 2`}} and {{`1 \n 0 \n 0 \n 2`}}.
 
 * Useful POSIX commands
     * {{`ls -l`}}: displays detailed file info for the whole directory
@@ -99,22 +99,19 @@ Assuming fork and execv do not fail, the possible outputs are {{`0 \n 0 \n 1 \n 
 * Open files: `int open(const char *path, int flags);`
     * `*path` is {{the path to the file to be opened}}.
     * `flags` can include the permissions or other special stuff to do. 
-        * Permission flags (3): {{`O_RDWR`, `O_RDONLY`, or `O_WRONLY`}}.
-        * {{`O_APPEND`}} appends to end of file; {{`O_TRUNC`}} truncates the file if it already exists
-        * {{`O_CREAT`}} creates a new file if one doesn't exist
-* Close files: `int close(int fd);`. It deallocating the file's {{array index}}.
-    * This does not affect {{other programs keeping track of file descriptors pointing to the same file}}. 
-    * If {{this was the last program that needed the file open}}, then the file's resources are deallocated as well.
-* When we redirect I/O using `./foo <input.txt` and `./foo >output.txt`, the OS is using {{file descriptors}} behind the scenes to implement the our request.
+        * Name three permission flags for `open`: {{`O_RDWR`, `O_RDONLY`, or `O_WRONLY`}}.
+        * The {{`O_APPEND`}} flag appends to end of file; the {{`O_TRUNC`}} flag truncates the file if it already exists
+        * The {{`O_CREAT`}} flag creates a new file if one doesn't exist
+* Close files: `int close(int fd);`. It deallocating the file's {{array index, aka the file descriptor}}.
+    * This does not affect {{other programs keeping track of file descriptors pointing to the same file}}. So if another file descriptor still points to the file, then {{the file stays open}}.
+    * If {{the last program pointing to the file calls `close()` on it}}, then the file's resources are deallocated as well.
+* When we redirect I/O using `./foo <input.txt` and `./foo >output.txt`, the OS is using {{`dup2()` on file descriptors}} behind the scenes to implement the our request.
 ```
 int fd = open("output.txt", O_WRONLY | O_CREAT | O_TRUNC);
 dup2(fd, STDOUT_FILENO);
 close(fd); 
 ```
-* The steps are as follows: 
-    * {{`open()` the file to/from which I/O will be piped}}
-    * Call `dup2()`. The first parameter is the file descriptor that {{points towards the original file}}, and the second parameter is the file descriptor that {{should be rerouted to point towards the same file}}.
-    * Finally, call {{`exec`}} to run whatever program you're trying to modify the I/O of. This only works because {{`exec` inherits the open file table of its parent process}}.
+* In `dup2()`, the first parameter is the file descriptor that {{points towards the original file}}, and the second parameter is the file descriptor that {{should be rerouted to point towards the same file}}.
 * Sharing and unsharing seek pointers:
     * How can you get two file descriptors to have two independent unshared seek pointers? {{Call `open()` twice on the same filename. You get two independent file descriptors, each with its own seek pointer}}.  
     * How can you get two file descriptors to share one seek pointer? {{Duplicate a file descriptor using `dup2()`. The new descriptor shares the same underlying open file description, including the seek pointer.}}  

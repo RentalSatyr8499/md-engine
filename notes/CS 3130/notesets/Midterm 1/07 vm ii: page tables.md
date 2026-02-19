@@ -25,7 +25,8 @@
 * Exercise: assuming the same memory state, translate the following virtual addresses: 
 ![alt text](image3.png){size=medium}
 *   * `0x12`: {{`0xBA`}}
-    * `0x12`, except PTEs are 2 bytes and contain 12 unused bits: {{`0x3C`}}
+![alt text](image7.png){size=medium}
+*   * `0x12`, except PTEs are 2 bytes and contain 12 unused bits: {{`0x3C`}}
 
 ## skipped pages 136-159 in vm.pdf
 because they have to do with an assignment due after the midterm

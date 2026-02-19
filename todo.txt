@@ -1,7 +1,11 @@
 - collapse/expand all headers
 - dynamic OG tags
 - shuffle table
-- hide blank length
+- shuffle blank length
 - bug where l2 bullets (under empty l1 bullets) dont show up after tables or code blocks
 - description for class 
 - description for noteset (inherited first part from class)
+- right click to flag blank
+- inline code padding only being added after blank is revealed 
+- "changes have been made to this noteset while you were on it. reload to see the most up-to-date version".
+- something broke the presence indicator...
