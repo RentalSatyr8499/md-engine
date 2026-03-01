@@ -112,7 +112,7 @@ dup2(fd, STDOUT_FILENO);
 close(fd); 
 ```
 * In `dup2()`, the first parameter is the file descriptor that {{points towards the original file}}, and the second parameter is the file descriptor that {{should be rerouted to point towards the same file}}.
-* Sharing and unsharing seek pointers:
+* Sharing and unsharing seek pointers: a seek pointer is the offset inside an open file that tells the OS which byte will be read or written next.
     * How can you get two file descriptors to have two independent unshared seek pointers? {{Call `open()` twice on the same filename. You get two independent file descriptors, each with its own seek pointer}}.  
     * How can you get two file descriptors to share one seek pointer? {{Duplicate a file descriptor using `dup2()`. The new descriptor shares the same underlying open file description, including the seek pointer.}}  
 
