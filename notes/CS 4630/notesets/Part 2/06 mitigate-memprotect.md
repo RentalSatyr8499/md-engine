@@ -16,12 +16,20 @@
         * ...for objects larger than 200 bytes: {{3,049,000 wasted bytes}} 
         * ...for all objects: {{39,490,000 wasted bytes}} 
 
-# come back and add exercise from slide 9 after piazza response
+* Exercise: Suppose there are 100,000 objects of 100 bytes, 1000 objects of 1000 bytes, and 100 objects of 10,000 bytes. Estimate space overhead of using guard pages...
+    * for objects larger than 4096 bytes: {{228,800 bytes}}
+    * for objects larger than 200 bytes: {{3,324,800 bytes}}
+    * for all objects: {{402,924,800 bytes}}
 
 * Guard pages can be used as an alternate solution to stack canaries. There are two ways to do this: you could either map the guard page, or not map it. More detail in the table below:
 | stack canary alternative strategy | how does it work? | pros | cons |
 |----------|----------|----------|----------|
 | unmapped guard page    | place a {{completely unmapped 4KB page}} directly above the {{buffer}}. The permissions of this page prohibit {{reading and writing}}. Any access into this guard page causes {{a page fault}}.  |  Strongest protection, because not even reading is allowed. | Higher overhead; it requires a full 4KB unmapped page. |
 | mapped guard page    | place a {{mapped write-protected page}} above the {{buffer}}. Any read into this guard page will {{succeed}}, and writing will cause {{a segfault}}.  |  cheaper than a full guard page | slightly weaker |
+
+* We use RELRO ("RELocation Read-Only") because we want certain things to only be readable at certain times. 
+    * Some data, like {{machine code}}, can stay permanently readable. But other sensitive data, like {{return addresses, local function pointers, vtables, the GOT}}, can't be made read-only because they change during execution. 
+    * For example, because {{the addresses of functions}} aren’t known until the program is loaded, the GOT and vtables are filled in by the {{dynamic linker}} at {{run}} time.
+    * 
 
 

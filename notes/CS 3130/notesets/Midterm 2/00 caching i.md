@@ -37,7 +37,8 @@ Exercise
         * byte from 0x1041: {{N}}
 * Cache access patterns: 
     * If the CPU requests data that happens to be in the cache, it's considered a "{{hit}}".
-    * If the CPU requests data that does not happen to be in the cache, it's considered a "{{miss}}". 
-        * When this occurs, the cache overwrites whatever data already exists at {{the block corresponding to the current index}} with the data the CPU requested. 
-        # not sure if that is correct
-# left off on 55
+    * If the CPU requests data that does not happen to be in the cache, it's considered a "{{miss}}". When this occurs, the cache overwrites whatever data already exists at {{the block corresponding to the current index}} with the data the CPU requested. 
+    # not sure if that is correct
+
+![alt text](image9.png){size=small}
+* Exercise: Suppose there are 4 byte blocks. Which accesses are hits? Answer: second access (00000001), fourth access (01100001), and fifth access (01100010).
