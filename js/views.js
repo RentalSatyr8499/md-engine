@@ -63,7 +63,7 @@ async function loadNotesets(className) {
 
     });
 
-    document.getElementById("presence-indicator").style.display = "flex";
+    // document.getElementById("presence-indicator").style.display = "flex";
     document.getElementById("reveal-toggle").style.display = "none";
     setupPresence(className);
 }
