@@ -1,53 +1,52 @@
-* Because set is determined by a memory's block index, each memory block has exactly {{one}} set that is can occupy. But cache is much smaller than memory, which means many memory blocks will map to the same set. Specifically, memory blocks that have the same {{index}} will map to the same set. This means that if two blocks differ by {{the size of the cache}}, they will map to the same set.
-    * If K is the number of sets, set 0 receives blocks {{0}}, {{K}}, {{2K}}, {{3K}}, etc.
+* Because set is determined by a memory's block index, each memory block has exactly {{one}} set that is can occupy. But cache is much smaller than memory, which means many memory blocks will map to the same set. Specifically, if two blocks differ by {{the size of the cache}}, they will map to the same set.
+    * Imagine memory as being divided into segments the size of the cache blocks, where each segment is numbered 0...n. If K is the number of sets in the cache, set `0` receives blocks {{0}}, {{K}}, {{2K}}, {{3K}}, etc.
     * `array[0]` and `array[X]` collide when `cache_size` = {{`X * element_size`}}.
-        * Equivalent formula: `X` = {{`cache_size / element_size}`}}.
-    * "Stride": the fixed distance you move forward by in memory between consecutive accesses in a loop. So if you're accessing the `array[0]`, `array[10]`, `array[20]`,..., the stride is {{10}}.
-    * "Conflict miss": when a miss occurs not because the cache doesn't have anything in that set yet, but because something else already occupies that set.
-    * "Thrashing": when a program repeatedly overwrites the same cache set over and over again because its access pattern keeps mapping to the same cache location(s). Aka many {{conflict misses}} occur.
+        * Equivalent formula: `X` = {{`cache_size / element_size`}}.
     * Accessing an array with a stride equal to {{the cache size}} forces thrashing.
-    * Exercise: can conflict misses can occur when the array fits entirely in cache? Why or why not? {{Yes. The cache maps data based on memory addresses, not the array's size or index. If the array's starting position in RAM (the base address) is not perfectly aligned with the start of the cache, or if you access two different memory locations that both "modulo" to the same cache slot, they will repeatedly evict each other.}}
-    * Using direct-map caching for other operations/data structures, like {{binary search tree}} or {{matrix multiplications}}, also requires access patterns that lead to thrashing. 
+        * "Stride": the fixed distance you move forward by in memory between consecutive accesses in a loop. So if you're accessing the `array[0]`, `array[10]`, `array[20]`,..., the stride is {{10}}.
+        * "Conflict miss": when a miss occurs not because the cache doesn't have anything in that set yet, but because {{something else already occupies that set}}.
+        * "Thrashing": when a program repeatedly overwrites the same cache set over and over again because its access pattern keeps mapping to the same cache location(s). Aka many {{conflict misses}} occur.
+    * Hard question: can conflict misses can occur even when the array fits entirely in cache? Why or why not? {{Yes. The cache maps data based on memory addresses, not the array's size or index. If the array's starting position in RAM (the base address) is not perfectly aligned with the start of the cache, or if you access two different memory locations that both "modulo" to the same cache slot, they will repeatedly evict each other.}}
+    * Name three data structures/operations that lead to thrashing when using direct-map caching: {{arrays}}, {{binary search tree}} and {{matrix multiplications}}. 
 * We can mitigate the problem of thrashing that comes with direct-mapped caching by introducing {{associativity}}.
-    * Associativity gives each set {{multiple slots ("ways")}}, which allows for {{multiple blocks with the same index to coexist in the cache}}.
+    * Associativity gives each set {{multiple slots ("ways")}}, which allows for multiple {{blocks of data with the same index}} to coexist in the cache.
     * Conceptual steps to caching associative memory:
         1. An address still splits into tag, index, and offset. The index selects which {{set}} the data goes in (this step is still the same as direct-map cache).
-        2. The cache checks all the {{ways}} in the selected {{set}} for a matching {{tag}}.
-        3. A hit occurs if {{any of the ways contain a matching tag}}; otherwise it's a miss.
+        2. The cache checks all the {{ways}} in the selected {{set}} for a matching {{tag}}. A hit occurs if {{any of the ways contain a matching tag}}; otherwise it's a miss.
     * With associativity, misses only appear if {{all the ways in a set are full and a new block must be inserted}}. This makes them less frequent than in direct-map caching.
-* When a set is full, the cache must decide {{which way to evict}}. One example of such a replacement policy is {{LRU ("least recently used")}}, which evicts the block that {{has not been accessed for the longest time}}.
-    * True LRU requires tracking {{full ordering of ways}}, which gets more expensive with {{more ways}} ("higher associativity").
-    * To indicate which way is least recently used, each set gets (an) LRU bit(s).
-    * Other replacement policies include: 
-        * LRU approximation: tracking the {{most recently used}} instead of {{what's not been recently used}} (and just avoid {{recently used}})
+* When a set is full in an associative cache, the cache must decide {{which way to evict}}. One way to do this is LRU ("{{least recently used}}"), which evicts the block that {{has not been accessed for the longest time}}.
+    * True LRU requires tracking {{full ordering of ways}}, which gets more expensive with more {{ways ("higher associativity")}}.
+    * To indicate which way is least recently used, each set gets an {{LRU bit}}.
+    * Other replacement policies: 
+        * LRU approximation: tracking the {{most recently used}} instead of {{what's not been recently used}} (and just avoid recently used)
         * FIFO: evicts the {{oldest}} block in the set.
         * Random: chooses a way at random; surprisingly effective and very cheap.
 * Ways to categorize a cache:
     * "Direct-mapped": {{1}}-way set associative ({{one}} block per set).
     * "E-way set associative": each set has {{E}} blocks.
     * "Fully associative": {{one}} set total.
-    * Higher associativity reduces {{conflict misses}} but increases {{hardware cost and lookup complexity}}.
+    * Higher associativity reduces {{conflict misses}} but increases {{lookup complexity and hardware cost}}.
 
-![alt text](image10.png)
+![alt text](image10.png){size=medium}
 * Exercise: suppose a cache had the above mapping. If the following addresses were accessed in order, which would be hits, which would be misses?
 | address | result |
 |----------|----------|
-| 00000000 | {{`miss`}} |
-| 00000001 | {{`hit!`}} |
-| 01100011 | {{`miss`}} |
-| 01100001 | {{`miss`}} |
-| 01100010 | {{`hit!`}} |
-| 00000000 | {{`hit!`}} |
-| 01100100 | {{`miss`}} |
+| `00000000` | {{`miss`}} |
+| `00000001` | {{`hit!`}} |
+| `01100011` | {{`miss`}} |
+| `01100001` | {{`miss`}} |
+| `01100010` | {{`hit!`}} |
+| `00000000` | {{`hit!`}} |
+| `01100100` | {{`miss`}} |
 * Exercise: suppose a cache had the same mapping as the problem above. Additionally, assume that the cache uses an LRU replacement policy. If the following addresses were accessed in order, which would be hits, which would be misses?
 | address | result |
 |----------|----------|
-| 01100001 | {{`miss`}} |
-| 01100000 | {{`hit!`}} |
-| 01100000 | {{`hit!`}} |
-| 00000000 | {{`miss`}} |
-| 11110000 | {{`miss`}} |
-| 11100000 | {{`hit!`}} |
+| `01100001` | {{`miss`}} |
+| `01100000` | {{`hit!`}} |
+| `01100000` | {{`hit!`}} |
+| `00000000` | {{`miss`}} |
+| `11110000` | {{`miss`}} |
+| `11100000` | {{`hit!`}} |
 
 ```c
 int array[4];
@@ -57,11 +56,11 @@ even_sum += array[2];
 odd_sum += array[1];
 odd_sum += array[3];
 ```
-* Exercise: Assume everything but `array` is kept in registers (and the compiler does not do
+* Exercise: Consider the code above. Assume everything but `array` is kept in registers (and the compiler does not do
 anything funny), that `array[0]` belongs to the beginning of cache block, and that blocks are 8 bytes. Fill out the following table:
 | memory access (in chronological order) | hit or miss? | cache contents afterwards |
 |----------|----------|----------|
-| {{read from `array[0]`}} | {{`miss`}} | {{`{array[0], array[1]}`}} |
+| read from `array[0]` | {{`miss`}} | {{`{array[0], array[1]}`}} |
 | {{read from `array[2]`}} | {{`miss`}} | {{`array[2], array[3]`}} |
 | {{read from `array[1]`}} | {{`miss`}} | {{`{array[0], array[1]}`}} |
 | {{read from `array[3]`}} | {{`miss`}} | {{`array[2], array[3]`}} |
@@ -79,11 +78,11 @@ odd_sum += array[3];
 odd_sum += array[5];
 odd_sum += array[7];
 ```
-* Exercise: Assume everything but `array` is kept in registers (and the compiler does not do
+* Exercise: Consider the code above. Assume everything but `array` is kept in registers (and the compiler does not do
 anything funny), that blocks are 8 bytes, and that the data cache has 2 sets. Fill out the following table:
 | memory access (in chronological order) | hit or miss? | set 1 contents afterwards | set 2 contents afterwards |
 |----------|----------|----------|----------|
-| {{read from `array[0]`}} | {{`miss`}} | {{`{array[0], array[1]}`}} | {{empty}} |
+| read from `array[0]` | {{`miss`}} | {{`{array[0], array[1]}`}} | {{empty}} |
 | {{read from `array[2]`}} | {{`miss`}} | {{`{array[0], array[1]}`}} | {{`{array[2], array[3]}`}} |
 | {{read from `array[4]`}} | {{`miss`}} | {{`{array[4], array[5]}`}} | {{`{array[2], array[3]}`}} |
 | {{read from `array[6]`}} | {{`miss`}} | {{`{array[4], array[5]}`}} | {{`{array[6], array[7]}`}} |
@@ -125,3 +124,14 @@ odd_sum += array[513];
 * Exercise: Assume everything but array is kept in registers (and the compiler does not do anything funny). 
     * What formula can we use to determine what set `array[x]` loads into? Answer: {{`x / elementsPerBlock) % numSets`, so `(x / 4) % 64` in this situation. }}
     * How many data cache misses on a 2KB 2-way set associative cache with 16B blocks? (observation: `array[0]`, `array[256]`, `array[512]`, `array[768]` are in same set).
+
+```c
+int array1[512]; int array2[512];
+...
+for (int i = 0; i < 512; i += 1){
+    sum += array1[i] * array2[i];
+}
+```
+* Exercise: Assume everything but `array1`, `array2` is kept in registers (and the compiler does not do anything funny). About how many data cache misses on a 2KB direct-mapped cache with 16B cache blocks? 
+    * Hint: {{depends on relative placement of `array1`, `array2`}}. 
+    * Answer: {{in the best case scenario, `array1` and `array2` land in different sets, and they never evict each other. Here, each array loads one block every four iterations, giving 512 misses total. But if both arrays map to the same set, they constantly replace each other’s blocks. Every iteration causes two misses, giving 1024 misses total. The worst case occurs when the location of `array1` and `array2` in memory differ by a multiple of the way size.}}

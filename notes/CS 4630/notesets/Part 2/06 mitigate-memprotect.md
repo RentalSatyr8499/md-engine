@@ -33,6 +33,7 @@
     * "Lazy binding": instead of resolving every function’s address at startup, the program fills the GOT with {{"trampolines" (essentially "I’ll look it up later" stubs)}}. The first time you call a function, the {{dynamic linker}} finds the {{real address}}, writes it into the GOT, and future calls go straight there. This speeds up {{startup}}.
     * "Partial RELRO": protects most dynamic linker metadata, but not {{the GOT entries for external library functions}}. It does, however, protect {{C++ vtables}}.
     * "Full RELRO": protects everything, including GOT entries. However, this also requires disabling {{lazy binding}}, because {{lazy binding needs to write to the GOT later}}.
+    # define what RELRO IS lmao
  * W^X ("Write XOR Execute"): the rule that {{memory should be either writable or executable, but never both}}. If attackers can't {{write to executable memory}}, they can’t inject new machine code.
     * Problematically, some real systems (that were created a long time ago) do execute code from writable memory. So W^X isn't always feasible.
     * Also, attackers can get around W^X by not injecting anything at all, but repurposing machine code already included in the program for malicious ends. This is called {{arc injection}}.

@@ -1,32 +1,19 @@
 # MDengine
 
-I built this engine that renders my class notes for school (.md files) into fill-in-the-blank-style study guides. Aaaand, this project is live!: https://probable-tribble.fly.dev
+I built this little thing that renders my class notes for school (.md files) into fill-in-the-blank-style study guides. See it live here: https://probable-tribble.fly.dev
 
-## Software design highlights
-
-### 😮 URL query parameters
-Instead of serving static files, the backend uses query parameters (ex. `?class=CS3130&noteset=Midterm1`) to dynamically render notes. This allows me to share URLs easily and reduce redunancy in my code. All the noteset structures are driven by the noteset file system (the engine scans the directory independently to see what needs to be loaded). Whew, no `manifest.json` needed...
-
-### 😮 Presence tracking
-This project uses a WebSocket-base presence system:
-- Shows online (active in last 60s) and idle counts
-- Tracks the number of people online in individual class notes (not collectively across the entire website). So the system also separates user presences by "rooms".
-
-### 😮 .md rendering and other UI features
-Customized .md rendering rules:
-- **`{{answer}}`**: click to hide/reveal the part of the statement (good for active recall, which is the entire point of the website). All blanks can be toggled at the same time as well.
-- **`text^sup`**: Automatic superscript rendering
-- **`text_sub`**: Automatic subscript rendering
-- **Code**: code blocks highlighted with highlight.js
-Other UI features:
-- **Asset path resolution**: Images automatically resolve from assets folder
-- **Collapsible sections**: headers can be clicked to expanded/collapsed using CSS animation
-
-### 😮 Asset caching
-Markdown files are cached in a javascript `Map` after the first load, reducing bandwidth.
+## Software design features
+* Instead of serving static files, the backend uses query parameters (ex. `?class=CS3130&noteset=Midterm1`) to dynamically render notes. This allows me to share URLs easily and reduce redunancy in my code. All the noteset structures are driven by the noteset file system (the engine scans the directory independently to see what needs to be loaded). Whew, no `manifest.json` needed...
+* Customized .md rendering rules:
+   * **`{{answer}}`**: click to hide/reveal the part of the statement (good for active recall, which is the entire point of the website). All blanks can be toggled at the same time as well.
+   * **`text^sup`**: Automatic superscript rendering
+   * **`text_sub`**: Automatic subscript rendering
+   * **Code**: code blocks highlighted with highlight.js
+* **Asset path resolution**: Images automatically resolve from assets folder
+* Asset caching: Markdown files are cached in a javascript `Map` after the first load, reducing bandwidth.
 
 ## Tech Stack
-- **Backend**: Node.js HTTP server with WebSocket support
+- **Backend**: Node.js HTTP server with WebSocket support 
 - **Frontend**: Vanilla JavaScript (no frameworks)
 - **Rendering**: [marked.js](https://marked.js.org/) for markdown, [highlight.js](https://highlightjs.org/) for code
 - **Deployment**: Docker + [Fly.io](https://fly.io)

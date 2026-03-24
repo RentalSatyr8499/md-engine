@@ -179,7 +179,7 @@ button {
 
 #reveal-toggle {
     position: fixed;
-    bottom: 80px; 
+    bottom: 20px; 
     right: 25px;
     cursor: pointer;
     opacity: 0.8;

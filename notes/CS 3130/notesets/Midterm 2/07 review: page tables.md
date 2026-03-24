@@ -28,9 +28,6 @@
 ![alt text](image7.png){size=medium}
 *   * `0x12`, except PTEs are 2 bytes and contain 12 unused bits: {{`0x3C`}}
 
-## skipped pages 136-159 in vm.pdf
-because they have to do with an assignment due after the midterm
-
 * Because there are huge amounts of virtual pages that are invalid, page tables aren't usually stored in arrays in memory, but rather, in {{wide trees}}. 
     * Each deeper layer of the tree represents {{a narrower and narrower range of virtual addresses}}.
     * This solves the problem of storing unused pages because {{if a range of addresses is invalid, an earlier node will prevent every single one of those entries from being stored}}. This is called a multi-level page table.
