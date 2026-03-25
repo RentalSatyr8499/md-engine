@@ -5,7 +5,12 @@
 | 2. write-no-allocate | {{directly write to memory without loading the block to cache}} | {{write misses are cheaper}} | {{lose any locality benefits}} | {{write-allocate}} |
 | 3. write-through | {{every write immediately updates memory}} | {{memory always up‑to‑date}} | {{slows things down when writes are frequent}} | {{write-back}} |
 | 4. write-back | {{only update memory when the block is evicted}}. This approach requires {{tracking a dirty bit.}} | {{allows us to take advantage of temporal write locality; reduces overall "memory traffic"}} | {{requires dirty‑bit tracking; evictions are more expensive}} | {{write-through}} |
- 
+
+* Write‑through caches have a rule: every write to the cache must also immediately write to memory. Directly implemented, this approach negatively impacts performance, because the CPU stalls on every write. For this reason, write-through caches often use a {{write buffer}} instead. 
+    * When the CPU writes to the cache, the cache puts the write into a small FIFO buffer, allowing the CPU to {{continue immediately instead of waiting on the write to memory}}. Then, the buffer slowly drains writes to memory in the background.
+    * But because of this, if the CPU later reads from memory, we must {{check the buffer first to make sure the requested address isn't still sitting in the buffer}}. Otherwise, the CPU might read stale data.
+* AMAT ("average memory access time"): a value representing the {{effective speed of memory}}. It can be calculating using the following formula: {{`AMAT = hit time + miss rate * miss penalty`}}.
+    * Example: if you have a 90% cache hit rate, hit time of 2 cycles, and a 30 cycle miss penalty, your AMAT is {{5 cycles}}. 
 ![alt text](image11.png){size=large}
 * Exercise: Consider the cache layout above. Fill out the following table. (Assume actions are performed alone, not one after the other)
 | action: | if this action requires reads from memory, where does it read from? | if this action requires writing to memory, where does it write to? | what is the dirty bit after this action? | what is the LRU bit after this action? |
@@ -22,17 +27,11 @@
 | reading 1 byte from `0x52` | {{yes, read from `mem[0x52-0x53]`}} | {{no next-level write}} | {{`0`}} | 
 | reading 1 byte from `0x50` | {{yes, read from block `mem[0x50-0x51]`}} | {{no next-level write}} | {{`1`}} | 
 
-* Write‑through caches have a rule: every write to the cache must also immediately write to memory. Directly implemented, this approach negatively impacts performance, because the CPU stalls on every write. For this reason, write-through caches often use a {{write buffer}} instead. 
-    * When the CPU writes to the cache, the cache puts the write into a small FIFO buffer, allowing the CPU to {{continue immediately instead of waiting on the write to memory}}. Then, the buffer slowly drains writes to memory in the background.
-    * But because of this, if the CPU later reads from memory, we must {{check the buffer first to make sure the requested address isn't still sitting in the buffer}}. Otherwise, the CPU might read stale data.
-* AMAT ("average memory access time"): a value represented the {{effective speed of memory}}. It can be calculating using the following formula: {{`AMAT = hit time + miss rate * miss penalty`}}.
-    * Example: if you have a 90% cache hit rate, hit time of 2 cycles, and a 30 cycle miss penalty, your AMAT is {{5 cycles}}. 
 * When it comes to the cache, naively traversing a multi-level page table is expensive because {{each memory access would require multiple additional memory accesses to fetch the PTEs}}. So instead, we often use {{a TLB ("Translation Lookaside Buffer")}}.
     * TLB ("Translation Lookaside Buffer"): Small cache of page table entries that translate {{VPNs}} into {{PPNs}}.
         * Organized just like a normal TIO cache, except the index and tag are derived from {{the VPN}}.
         * The offset bits are always {{`0000...`}} because {{there's only one PTE per entry}}.
-        * With TLBs, it's best to have a {{high}} level of associativity. This is because {{there are few active PTEs at once, so eviction is cheaper, and it's really important to prevent conflict misses with TLBs, which are costly}}.
-    * PTEs have strong temporal locality (reused often), because {{at any given time there are only a few pages active in a program}}. 
+    * PTEs have strong temporal locality (reused often), because {{at any given time there are only a few pages active in a program}}. Therefore, with TLBs, it's best to have a {{high}} level of associativity -- {{eviction}} needs to be rare. It's really important to prevent {{conflict misses}} with TLBs, which are costly.
 * Exercise: suppose we have a 4-entry, 2-way TLB, LRU replacement policy cache that is initially empty. If pages are 4096 bytes...
     * How many index bits are there? {{1}}
     * What's the TLB index of virtual address `0x12345`? {{`0`}}
@@ -67,3 +66,12 @@
     7. read 4 bytes from an address with tag 0x43, index 0x2, offset 0x8
     8. write 4 bytes to an address with tag 0x44, index 0x2, offset 0xc
     * After these accesses run, which blocks associated which cache tags in set index 0x2 will have their dirty bits set? Write the tag values separated by commas. If no dirty bits will be set, write "none". {{`0x41`. that's it!}}
+
+* Exercise: Suppose a system has 1024 byte pages, 26-bit virtual addresses, 24-bit physical addresses, two-level page tables with 256 entries in page tables at each level, a 4-way data TLB with 32 entries; and a 8KB (8192 byte) two-way set associative data cache with 256-byte blocks which uses only physical addresses. (This cache has 8 block offset bits and 4 set index bits.)
+    * Each tag stored in the TLB takes up {{13}} bits.
+    * Assuming both accesses would be data cache hits and TLB hits, reading the byte from virtual address `0x12345` would {{always}} use the same TLB **set** as reading the byte from virtual address `0xF2345`. (always/sometimes/never)
+    * Assuming both accesses would be data cache hits and TLB hits, reading the byte from virtual address `0x12345` would {{never}} use the same TLB **entry** as reading the byte from virtual address `0xF2345`. (always/sometimes/never)
+    * Assuming both accesses would be data cache hits and TLB hits, reading the byte from virtual address `0x12345` would {{sometimes}} use the same **data cache set**  as reading the byte from virtual address `0xF2345`. (always/sometimes/never)
+
+
+

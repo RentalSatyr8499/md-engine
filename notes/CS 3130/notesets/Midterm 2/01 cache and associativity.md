@@ -61,9 +61,9 @@ anything funny), that `array[0]` belongs to the beginning of cache block, and th
 | memory access (in chronological order) | hit or miss? | cache contents afterwards |
 |----------|----------|----------|
 | read from `array[0]` | {{`miss`}} | {{`{array[0], array[1]}`}} |
-| {{read from `array[2]`}} | {{`miss`}} | {{`array[2], array[3]`}} |
+| {{read from `array[2]`}} | {{`miss`}} | {{`{array[2], array[3]}`}} |
 | {{read from `array[1]`}} | {{`miss`}} | {{`{array[0], array[1]}`}} |
-| {{read from `array[3]`}} | {{`miss`}} | {{`array[2], array[3]`}} |
+| {{read from `array[3]`}} | {{`miss`}} | {{`{array[2], array[3]}`}} |
 
 ```c
 int array[8]; /* assume aligned */
