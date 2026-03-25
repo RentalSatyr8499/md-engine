@@ -1,6 +1,7 @@
+* We wanna implement a program that lets us move files: 
 ```c
 struct Dir {
-mutex_t lock; HashMap entries;
+    mutex_t lock; HashMap entries;
 };
 void MoveFile(Dir *from_dir, Dir *to_dir, string filename) {
     mutex_lock(&from_dir−>lock);
@@ -19,7 +20,7 @@ void MoveFile(Dir *from_dir, Dir *to_dir, string filename) {
     * Thread 1 holds A → wants B
     * Thread 2 holds B → wants C
     * Thread 3 holds {{C}} → wants {{A}}
-* Deadlock isn't just about locks; it could be about any resource that can be held and waited on. For example, if two threads each want 2 MB of memory, the system has exactly 2 MB total, and {{each thread allocates 1 MB successfully}}. Then both threads are stuck waiting for {{the memory held by the other thread}}.
+* Deadlock isn't just about locks; it could be about any resource that can be held and waited on. For example, if two threads each want 2 MB of memory, the system has exactly 2 MB total, and each thread {{allocates 1 MB}} successfully. Then both threads are stuck waiting for {{the memory held by the other thread}}.
 
 ```c
 RemoveNode(LinkedListNode *node) {
@@ -44,7 +45,7 @@ RemoveNode(LinkedListNode *node) {
     2. Hold and wait: a thread {{holds one resource}} while waiting for another.
     3. No preemption: resources can’t be {{forcibly taken away}}.
     4. Circular wait: A cycle exists (T1 waits for T2, T2 waits for T3, …, Tn waits for {{T1}}).
-* We learned strategies for preventing deadlocks that each target one of the particular conditions above. 
+* Fill out this table.
 | deadlock condition | mitigating strategy(s) |
 |----------|----------|
 | Mutual exclusion | (1) {{infinite resources}}; (2) no {{shared resources}} |

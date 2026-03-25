@@ -46,7 +46,7 @@
 | `01100000` | {{`hit!`}} |
 | `00000000` | {{`miss`}} |
 | `11110000` | {{`miss`}} |
-| `11100000` | {{`hit!`}} |
+| `11100000` | {{`miss`}} |
 
 ```c
 int array[4];
@@ -56,8 +56,7 @@ even_sum += array[2];
 odd_sum += array[1];
 odd_sum += array[3];
 ```
-* Exercise: Consider the code above. Assume everything but `array` is kept in registers (and the compiler does not do
-anything funny), that `array[0]` belongs to the beginning of cache block, and that blocks are 8 bytes. Fill out the following table:
+* Exercise: Consider the code above. Assume everything but `array` is kept in registers (and the compiler does not do anything funny) and that `array[0]` belongs to the beginning of cache block. There is only one set in the cache, and it is 8 bytes. Fill out the following table:
 | memory access (in chronological order) | hit or miss? | cache contents afterwards |
 |----------|----------|----------|
 | read from `array[0]` | {{`miss`}} | {{`{array[0], array[1]}`}} |
