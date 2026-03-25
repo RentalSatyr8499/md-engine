@@ -126,6 +126,24 @@ odd_sum += array[513];
     * How many data cache misses on a 2KB 2-way set associative cache with 16B blocks? (observation: `array[0]`, `array[256]`, `array[512]`, `array[768]` are in same set).
 
 ```c
+for (int outer = 0; outer < 1000; outer += 1) {
+    array[0] += 1;
+    array[9] += 1;
+    array[18] += 1;
+    array[27] += 1;
+    array[36] += 1;
+    array[45] += 1;
+    array[54] += 1;
+    array[63] += 1;
+    array[72] += 1;
+}
+```
+* Exercise: Consider a direct-mapped data cache with 16-byte cache blocks, 16 sets, and a C array declared as : `int array[1024];` where the array starts on an address that is a multiple of 16384 on a system where ints take up 4 bytes and virtual memory is not in use. In the code snippet above, how many misses occur? 
+    * Hint: {{There's one miss for every set to which only one array access maps, and 1000*n misses for every set to which multiple array accesses map (where n is the number of array accesses that conflict on the same set). Only 64 integers can fit in the cache. }}
+    * Answer: {{2007}}
+    * Explanation: {{(from site) "relevant mappings of array indices to sets: set 0: 0-3, set 2: 8-11 AND 72-75, set 4: 16-19; set 6: 25-28; set 9: 36-39; set 11: 44-47; set 13: 52--55 set 15: 60-63;. so 7 misses for sets 0 (array[0]), 4 (array[18]), 6 (array[27]), 9 (array[36]), 11 (array[45]), 13 (array[54]), 15 (array[63]) being loaded the first time, then those acceesses are all hits in future iterations"}}
+
+```c
 int array1[512]; int array2[512];
 ...
 for (int i = 0; i < 512; i += 1){

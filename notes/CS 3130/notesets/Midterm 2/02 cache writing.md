@@ -1,10 +1,10 @@
 * Writing to da cache: we learned about four different cache strategies pertaining to writing in class. Fill out the table below.
-| strategy | what is this strategy an alternative to? | what does this strategy do? | strategy pros | strategy cons |
+| strategy | what does this strategy do? | strategy pros | strategy cons | what is this strategy an alternative to? |
 |----------|----------|----------|----------|----------|
-| 1. write-allocate | {{write-no-allocate}} | {{load the whole block into the cache, then write to it}} | {{allows us to take advantage of locality}} | {{misses cost a lot, because we fetching a full block every time}} |
-| 2. write-no-allocate | {{write-allocate}} | {{directly write to memory without loading the block to cache}} | {{write misses are cheaper}} | {{lose any locality benefits}} |
-| 3. write-through | {{write-back}} | {{every write immediately updates memory}} | {{memory always up‑to‑date}} | {{slows things down when writes are frequent}} |
-| 4. write-back | {{write-through}} | {{only update memory when the block is evicted}}. This approach requires {{tracking a dirty bit.}} | {{allows us to take advantage of temporal write locality; reduces overall "memory traffic"}} | {{requires dirty‑bit tracking; evictions are more expensive}} |
+| 1. write-allocate | {{load the whole block into the cache, then write to it}} | {{allows us to take advantage of locality}} | {{misses cost a lot, because we fetching a full block every time}} | {{write-no-allocate}} |
+| 2. write-no-allocate | {{directly write to memory without loading the block to cache}} | {{write misses are cheaper}} | {{lose any locality benefits}} | {{write-allocate}} |
+| 3. write-through | {{every write immediately updates memory}} | {{memory always up‑to‑date}} | {{slows things down when writes are frequent}} | {{write-back}} |
+| 4. write-back | {{only update memory when the block is evicted}}. This approach requires {{tracking a dirty bit.}} | {{allows us to take advantage of temporal write locality; reduces overall "memory traffic"}} | {{requires dirty‑bit tracking; evictions are more expensive}} | {{write-through}} |
  
 ![alt text](image11.png){size=large}
 * Exercise: Consider the cache layout above. Fill out the following table. (Assume actions are performed alone, not one after the other)
@@ -48,3 +48,22 @@
 |read |0x664080 |0x5F9080|{{`miss`}} | {{`0x664`, `0x7FFFE`}}| {{`0x7FFFD`}}|
 |read |0x440038 |0x554038|{{`miss`}} | {{`0x664`, `0x440`}}| {{`0x7FFFD`}}|
 |write |0x7FFFDFF0 |0x5F8FF0|{{`hit!`}} | {{`0x664`, `0x440`}}| {{`0x7FFFD`}}|
+
+* Exercise: Consider a 2-way set associative cache with, 16-byte cache blocks, 32 sets, a write-no-allocate policy, a write-back policy, and an LRU replacement policy. Suppose the cache is initially empty and the following accesses are performed in this order:
+    1. read 4 bytes from an address with tag 0x40, index 0x2, offset 0x0
+    2. write 4 bytes to an address with tag 0x40, index 0x2, offset 0x0
+    3. read 4 bytes to an address with tag 0x41, index 0x2, offset 0x0
+    4. read 4 bytes to an address with tag 0x42, index 0x2, offset 0x0
+    5. read 4 bytes to an address with tag 0x43, index 0x2, offset 0x0
+    6. write 2 bytes to an address with tag 0x30, index 0x1, offset 0x0
+    * As a result of the above accesses, we would expect {{18}} bytes to be written to memory from the cache.
+*   Assume the same cache layout, the cache is initially empty, and the but accesses are performed in the following order instead:
+    1. read 4 bytes from an address with tag 0x40, index 0x2, offset 0x4
+    2. read 4 bytes from an address with tag 0x40, index 0x2, offset 0x8
+    3. write 4 bytes to an address with tag 0x40, index 0x2, offset 0xc
+    4. read 4 bytes from an address with tag 0x41, index 0x2, offset 0x0
+    5. read 4 bytes from an address with tag 0x42, index 0x2, offset 0x0
+    6. write 4 bytes from an address with tag 0x41, index 0x2, offset 0x4
+    7. read 4 bytes from an address with tag 0x43, index 0x2, offset 0x8
+    8. write 4 bytes to an address with tag 0x44, index 0x2, offset 0xc
+    * After these accesses run, which blocks associated which cache tags in set index 0x2 will have their dirty bits set? Write the tag values separated by commas. If no dirty bits will be set, write "none". {{`0x41`. that's it!}}
