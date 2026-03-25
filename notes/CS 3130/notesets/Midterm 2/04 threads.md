@@ -97,3 +97,24 @@ int main() {
 }
 ```
 * Consider the above code that uses the POSIX ("pthreads") API. When `main()` is run, what is the maximum number of threads, including the initial thread that runs `main()`, that can be running at the same time? Answer: {{5}}
+
+```c
+void *add_to_list(void *argument) {
+    int *p;
+    p = (int*) argument;
+    ...
+}
+
+int main() {
+    ...
+    void *new_ptr1; void *new_ptr2;
+    if (0 != pthread_create(&p1, NULL, add_to_list, &x)) handle_error();
+    ...
+}
+```
+* Exercise: Consider the code above. The line `new_item->value = *p` assigns a value read from __ to new_item->value. Answer: {{A}}
+    * A. the stack of the thread that runs main
+    * B. the stack of one of the threads created by pthread_create calls in main
+    * C. the heap
+    * D. the region used to store global variables
+    * E. either the stack of the thread that runs main or the stack of one of the created threads, depending which time it is run

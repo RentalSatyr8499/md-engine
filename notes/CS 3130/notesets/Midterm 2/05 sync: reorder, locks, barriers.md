@@ -4,9 +4,9 @@
     * Exercise: For each of the following scenarios, what are possible values of `x`?
 | Thread A runs...| Thread B runs...| possible resulting values of (assume operations run to completion or not at all) `x`|
 |----------|----------|----------|
-| `x = 1;`|`y = 2;`| `1` |
-| `x = y+1;`|`y = 2; y *= 2;`| `1`, `5`, `3` |
-| `x = 1;`|`x = 2;`| `1`, `2`|
+| `x = 1;`|`y = 2;`| {{`1`}} |
+| `x = y+1;`|`y = 2; y *= 2;`| {{`1`, `5`, `3`}} |
+| `x = 1;`|`x = 2;`| {{`1`, `2`}}|
 * "Atomic operations": {{operations that run to completion or not at all}}. This is an important used for {{safe synchronization (using threads safely)}}.
     * If operations are non-atomic, running `x = 1;` on Thread A and `y = 2;` on Thread B can result in the following possible values for `x`: {{`1`, `2`, `3`}}
     * On most machines, {{loading}} and {{storing}} *aligned* words are atomic. "Aligned" simply means {{stored at an address that is a multiple of the word size}}. Which of the following fall into this category, and are thus atomic? Assume words are 64 bits.
@@ -96,3 +96,54 @@ void thread_two() {
 }
 ```
 * Exercise: if both threads in the above code are run at once, what is printed? {{`50 30`}}
+
+
+```c
+struct item {
+    int value;
+    struct item *next;
+    pthread_mutex_t lock;
+};
+
+struct item *head;
+pthread_mutex_t head_lock;
+
+void AddItemAtTail(struct item *item) {
+    item->next = NULL;
+    pthread_mutex_lock(&head_lock);
+    if (head == NULL) {
+        head = item;
+        pthread_mutex_unlock(&head_lock);
+    } else {
+        pthread_mutex_lock(&head->lock);
+        struct item *prev = head;
+        pthread_mutex_unlock(&head_lock);
+        while (prev->next != NULL) {  // (1)
+            struct item *old_prev = prev;
+            pthread_mutex_lock(&prev->next->lock);
+            prev = prev->next;
+            pthread_mutex_unlock(&old_prev->lock);
+        }
+        prev->next = item;
+        pthread_mutex_unlock(&prev->lock);
+    }
+}
+
+struct item *GetAndRemoveAtHead() {
+    struct item *result = NULL;
+    pthread_mutex_lock(&head_lock);
+    if (head != NULL) {
+        struct item *result = head;
+        pthread_mutex_lock(&result->lock);   // (2)
+        head = result->next;
+        pthread_mutex_unlock(&result->lock); // (2)
+    }
+    pthread_mutex_unlock(&head_lock);
+    return result;
+}
+```
+* Exercise: Consider the above code. If the mutex lock and unlock labeled (2) were removed, then there'd be a potential for a race condition. For each of the following race conditions, tell me if they are possible. 
+    * when the list has ten items and there are two simultaneous calls to `GetAndRemoveAtHead()`, only one item is removed {{`N`}}
+    * when the list is empty and there is a simultaneous call to `GetAndRemoveAtHead()` and `AddItemAtTail()`, the added item is not added to the list or returned by `GetAndRemoveAtHead` {{`N`}}
+    * when the list has exactly one item and there is a simultaneous call to `AddItemAtTail()` and `GetAndRemoveAtHead()`, the added item is not added to the list or returned by `GetAndRemoveAtHead()` {{`Y`}}
+    * when the list has ten items and there is a simultaneous call to `AddItemAtTail()` and `GetAndRemoveAtHead()`, no items are removed from the list {{`N`}}

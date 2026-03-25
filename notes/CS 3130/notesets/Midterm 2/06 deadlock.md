@@ -57,3 +57,37 @@ RemoveNode(LinkedListNode *node) {
     * Another strategy is to make threads run one-at-a-time.
 * In order to allow for preemption (for threads to forcibly take resources from one another), you also need make sure you have a way to {{undo partial operations}}.
 
+```
+Lock chopsticks[NUM_CHOPSTICKS];
+
+int GetChopstick() {
+    for (int i = 0; i < NUM_CHOPSTICKS; i++) {
+        if (trylock(chopsticks[i])) return i;
+    }
+    return -1; 
+}
+
+void PutDown(x) { Unlock(chopsticks[x]); }
+
+void Eat() {
+    left = right = -1;
+
+    while (left == -1)
+        left = GetChopstick();
+
+    while (right == -1)
+        right = GetChopstick();
+
+    // use chopsticks and eat
+
+    PutDown(left)
+    PutDown(right)
+}
+```
+* Exercise: Consider the code above; suppose we modify the dining philosophers to put all chopsticks in the center of the table where each of the philosophers takes the first of those chopsticks that is available. For each of the following scenarios, is deadlock possible?
+    * 5 philosophers, 5 chopsticks {{`Y`}}
+    * 4 philosophers, 5 chopsticks {{`N`}}
+    * 5 philosophers, 6 chopsticks {{`N`}}
+    * 5 philosophers, 4 chopsticks {{`Y`}}
+
+
