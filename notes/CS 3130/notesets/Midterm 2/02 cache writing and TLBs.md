@@ -23,7 +23,7 @@
 * Exercise: Consider the cache layout above. Fill out the following table. (Assume actions are performed alone, not one after the other)
 | action: | if this action requires reads from memory, where does it read from? | if this action requires writing to memory, where does it write to? | what is the LRU bit after this action? |
 |----------|----------|----------|----------|
-| writing 1 byte to `0x33` | {{no next-level read or write}} | {{yes, write to `mem[0x33]`}} | {{`1`}} | 
+| writing 1 byte to `0x33` | {{no next-level read}} | {{yes, write to `mem[0x33]`}} | {{`0`}} | 
 | reading 1 byte from `0x52` | {{yes, read from `mem[0x52-0x53]`}} | {{no next-level write}} | {{`0`}} | 
 | reading 1 byte from `0x50` | {{yes, read from block `mem[0x50-0x51]`}} | {{no next-level write}} | {{`1`}} | 
 
