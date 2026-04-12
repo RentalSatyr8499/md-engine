@@ -30,6 +30,7 @@
 * When it comes to the cache, naively traversing a multi-level page table is expensive because {{each memory access would require multiple additional memory accesses to fetch the PTEs}}. So instead, we often use {{a TLB ("Translation Lookaside Buffer")}}.
     * TLB ("Translation Lookaside Buffer"): Small cache of page table entries that translate {{VPNs}} into {{PPNs}}.
         * Organized just like a normal TIO cache, except the index and tag are derived from {{the VPN}}.
+        * Any two virtual addresses with the same {{VPN}} will also correspond to the same TLB entry.
         * The offset bits are always {{`0000...`}} because {{there's only one PTE per entry}}.
     * PTEs have strong temporal locality (reused often), because {{at any given time there are only a few pages active in a program}}. Therefore, with TLBs, it's best to have a {{high}} level of associativity -- {{eviction}} needs to be rare. It's really important to prevent {{conflict misses}} with TLBs, which are costly.
 * Exercise: suppose we have a 4-entry, 2-way TLB, LRU replacement policy cache that is initially empty. If pages are 4096 bytes...
