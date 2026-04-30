@@ -23,9 +23,10 @@
             "secondsUntilIdle": 60
         };
     </script>
-    <script src="./js/presence.js"></script>
-    <script src="./js/utils.js"></script>
+    <script src="./js/notes.js"></script>
+    <script src="./js/render.js"></script>
     <script src="./js/views.js"></script>
+    <script src="./js/router.js"></script>
     
     <div id="reveal-toggle" title="toggle all fill-in-the-blanks" style="display: none;">
         <img id="revealIcon" src="./assets/eye-open.png">
@@ -40,7 +41,6 @@
 
     <script>
         routeFromURL();
-        window.onpopstate = routeFromURL;
     </script>
 </body>
 </html>
