@@ -1,0 +1,137 @@
+1a
+
+make object
+if (something complicated)
+    make Rc.1 to object
+if (something complicated but is always true if the first is true)
+    make Rc.2 to object
+
+free Rc.1
+use object 
+
+2a
+if (something complicated) 
+    result = fread
+something complicated
+if (something complicated but is always true if the first conditional is true)
+    check result
+
+3a
+pointer = object1
+if (something)
+    pointer = object2 // far from object 1 in memory
+
+
+|Before renaming|After renaming|
+|---|---|
+|add %r01, %r02-> %r02|add ____, ____, -> ____|
+|add %r02, %r03-> %r03|add ____, ____, -> ____|
+|imul %r02, %r03-> %r03|imul ____, ____, -> ____|
+|mov 0x0(%r03)-> %r01|mov 0x0(____)-> ____|
+|sub %r02, %r03-> %r03|sub ____, ____, -> ____|
+|add %r03, %r04-> %r04|add ____, ____, -> ____|
+|movq 0x0(%r01)-> %r01|movq 0x0(____)-> ____|
+|imul %r01, %r04-> %r04|imul ____, ____, -> ____|
+|add %r04 %r04-> %r04|add ____, ____, -> ____|
+
+
+A. movq (%x05) -> %x16
+B. add %x04, %x06 -> %x17
+C. sub %x01, %x02 -> %x18
+D. imul %x16, %x18 -> %x19
+E. movq (%x06) -> %x20
+F. add %x03, %x08 -> %x21
+G. add %x21, %x18 -> %x22
+H. movq (%x18) -> %x23
+I. imul %x22, %x20 -> %x24
+J. movq %x21, (%x23) -> ?
+
+|cycle number:|1|2|3|4|
+|---|---|---|---|---|
+|ALU 1|B| | | |
+|ALU 2|C| | | |
+|Memory stage 1|A| | | |
+|Memory stage 2| |A| | |
+|Memory stage 3| | | A| |
+
+1 Hypothetical OOO processor
+For this assignment, we will consider an out-of-order processor which has two execution units for arithmetic instructions, and one execution unit for memory instructions.
+
+1.0.1 This processor’s pipeline
+Instructions in this processor are executed as follows:
+
+first, they go through a set of in-order pipeline stages, two a time:
+
+fetch, where instructions are read from the pipeline stage. For this exercise, assume branch prediction is perfect so two new instructions are fetched every cycle
+decode, where the machine is interpreted
+rename, where register renaming takes place and instructions are placed into an instruction queue, available to be issued as early as the next cycle
+then, each cycle instructions are issued from the instruction queue:
+
+each cycle, the instruction queue is scanned for instructions whose operands are ready. (For this exercise, we’ll only account for their register operands being ready and assume that we do not need to worry about data memory-related dependencies.)
+an instruction can be issued if its operand values will be available by the beginning next cycle (when it executes); so operands are considered ready during the cycle in which the instruction computing them executes
+once an instruction to issue is identified, the issue stage will handle forwarding its operand values or reading them from the register file, as appropriate
+the first memory instruction available and first two non-memory instructions available are selected to be issued. (If fewer instructions are available, as many are issued as possible.)
+during the cycle an instruction is issued, its register value inputs are read or forwarded
+when an instruction is issued, in the following cycles it is executed on an execution unit
+
+for memory instructions, this execution unit is a pipelined data cache. The data cache receives one instruction per cycle and produces the result after three cycles. To simplify this exercise, we will assume no cache misses.
+for non-memory instructions, this execution unit is one of two arithmetic logic units. Each of these ALUs receives one instruction per cycle and produces the result near the end of the same cycle.
+in the cycle after an instruction is executed its result is written back to the register file in one cycle
+
+finally, up to two instructions are committed each cycle using information placed in a reorder buffer during the issue stage. An instruction is only committed if all instructions fetched before have also committed.
+
+Given these stages, an non-memory instruction will take 7 cycles to go through the pipeline if it does not need to wait for it operands or wait for earlier instructions to commit (fetch, decode, rename, issue/register read, execute, writeback, commit). A memory instruction will take 9 cycles (two extra cycles of `execution’ because of the speed of the data cache).
+
+When operands are not available, an instruction will spend extra cycles waiting in the instruction queue between its rename and issue stage. When an instruction is written back but some prior instructions have not done so, then the instruction will spend extra cycles waiting in the reorder buffer before it is committed.
+
+1.0.2 This processor’s registers
+The processor has 15 logical registers %r01 through %r15, but these are implemented using 64 physical registers and register renaming. We call the physical registers %x01 through %x64.
+
+We will show instructions in a three-argument form like (regardless of whether register renaming has taken place):
+
+add %r01, %r02 -> %r03
+this indicates to add %r01 and %r02 and put the result into %r03.
+
+Answer the questions on the answer sheet linked above.
+
+
+Complete a pipeline diagram for the processor running the following instructions (shown in the form from before register renaming):
+
+1. add %r02, %r01 -> %r01
+2. add %r02, %r01 -> %r01
+3. add %r02, %r03 -> %r03
+4. add %r03, %r04 -> %r04
+5. add %r04, %r06 -> %r06
+6. add %r01, %r02 -> %r05
+7. add %r04, %r03 -> %r03
+8. add %r01, %r08 -> %r08
+Identify the stages as:
+
+F for when the instruction is feteched
+D for when an instruction is decoded
+R for when an instruction is renamed and dispatched into an instruction queue
+I for when an instruction is issued from an instruction queue and its registers are read
+E for when an instruction is being executed (after it is issued)
+W for when an instruction’s results are written back to the physical register file
+C for when an instruction is committed
+Leave the specified stage blank when an instruction is not being processed in any of the above ways (such as when the instruction is in the instruction queue waiting to be issued or any cycles between when an instruction is written back and when it is committed).
+
+The first three rows are:
+
+1 F D R I E W C
+2 F D R   I E W C
+3   F D R I E W C
+complete the remaining rows of the table at the answer sheet linked above.
+
+You may assume that register values computed by previous instructions are available and that physical registers are free such that stages will not be delayed for missing previous register values or lack of available physical registers.
+
+|Instruction|||||||||
+|---|---|---|---|---|---|---|---|---|
+|add %r02, %r01 -> %r01|F|D|R|I|E|W|C| |
+|add %r02, %r01 -> %r01|F|D|R| |I|E|W|C|
+|add %r02, %r03 -> %r03| |F|D|R|I|E|W|C|
+|add %r03, %r04 -> %r04| | | | | | | | |
+|add %r04, %r06 -> %r06| | | | | | | | |
+|add %r01, %r02 -> %r05| | | | | | | | |
+|add %r04, %r03 -> %r03| | | | | | | | |
+|add %r01, %r08 -> %r08| | | | | | | | |

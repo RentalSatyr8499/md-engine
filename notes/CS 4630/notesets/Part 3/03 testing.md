@@ -12,6 +12,9 @@
 |"completeness"|{{even with millions of tests, you might still not be lucky enough to hit "interesting inputs"}}|{{smart fuzzing, which biases random inputs toward exploring new behavior}}|
 * An example of a fuzzer that uses coverage-based fuzzing, also called {{white}}box fuzzing, is {{American Fuzzy Lop (AFL)}}.
 
+# stuff about cmplog
+
+
 # Exercises
 ```c
 void foo(unsigned a, unsigned b, unsigned c) {
