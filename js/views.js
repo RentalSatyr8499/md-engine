@@ -1,4 +1,4 @@
-async function loadClasses() {
+async function d() {
     document.title = "MD Engine";
     const classDirs = await fetchDirectoryListing("notes/");
     const container = document.getElementById("content");
@@ -19,7 +19,7 @@ async function loadClasses() {
 
         item.onclick = () => {
             history.pushState({}, "", `/?class=${encodeURIComponent(name)}`);
-            routeFromURL();
+            a();
         };
 
 
@@ -30,7 +30,7 @@ async function loadClasses() {
     document.getElementById("presence-indicator").style.display = "none";
 }
 
-async function loadNotesets(className) { 
+async function e(className) { 
     document.title = `${className}: notesets`;
 
     const notesetDirs = await fetchDirectoryListing(`notes/${className}/notesets/`); 
@@ -56,7 +56,7 @@ async function loadNotesets(className) {
                 "",
                 `/?class=${encodeURIComponent(className)}&noteset=${encodeURIComponent(name)}`
             );
-            routeFromURL();
+            a();
         };
 
         document.getElementById("main-container").appendChild(item);
@@ -65,10 +65,10 @@ async function loadNotesets(className) {
 
     // document.getElementById("presence-indicator").style.display = "flex";
     document.getElementById("reveal-toggle").style.display = "none";
-    setupPresence(className);
+    g(className);
 }
 
-async function loadNoteset(name, className) {
+async function f(name, className) {
     document.title = `${className} | ${name}`;
     const container = await buildNotesetUI(name, className);
 
@@ -104,4 +104,44 @@ async function loadNoteset(name, className) {
     // document.getElementById("presence-indicator").style.display = "flex";
     document.getElementById("reveal-toggle").style.display = "flex";
     setupRevealToggle();
+}
+
+async function b() {
+    const q = "7d5a81efaff0a444b729e06ab3768a40ec82be5769c667b99810dfaeca84930a";
+
+    if (sessionStorage.getItem("r") === "1") {
+        return true;
+    }
+
+    const s = document.getElementById("content");
+    s.innerHTML = `
+        <div style="
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        ">
+            <div style="width: 400px; text-align: center;">
+                <input id="t" type="text" placeholder="what is my phone number"
+                    style="width: 100%; margin-bottom: 10px;">
+                <p id="u" style="color: red; display: none;">Incorrect</p>
+            </div>
+        </div>
+    `;
+
+    return new Promise(v => {
+        document.getElementById("t").addEventListener("keydown", async (w) => {
+            if (w.key === "Enter") {
+                const x = w.target.value;
+                const y = await c(x);
+
+                if (y === q) {
+                    sessionStorage.setItem("r", "1");
+                    v(true);
+                } else {
+                    document.getElementById("u").style.display = "block";
+                }
+            }
+        });
+    });
 }

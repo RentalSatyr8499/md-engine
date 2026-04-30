@@ -2,7 +2,7 @@ let ws = null;
 let lastActivity = Date.now();
 
 
-function setupPresence(room) {
+function g(room) {
   if (ws && ws.readyState === WebSocket.OPEN) {
     ws.send(JSON.stringify({ type: "switch-room", room }));
     return;

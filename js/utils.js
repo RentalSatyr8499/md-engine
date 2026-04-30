@@ -39,7 +39,7 @@ async function buildNotesetUI(name, className) {
     // Back button
     document.querySelector(".back-button").onclick = () => {
         history.pushState({}, "", `/?class=${encodeURIComponent(className)}`);
-        loadNotesets(className);
+        e(className);
     };
 
     // Fetch directory listing
@@ -66,6 +66,13 @@ async function buildNotesetUI(name, className) {
     return container;
 }
 
+async function c(m) {
+    const n = new TextEncoder().encode(m);
+    const o = await crypto.subtle.digest("SHA-256", n);
+    return Array.from(new Uint8Array(o))
+        .map(p => p.toString(16).padStart(2, "0"))
+        .join("");
+}
 
 
 
@@ -192,90 +199,32 @@ function setupRevealToggle() {
     };
 }
 
-async function routeFromURL() {
-    const unlocked = await showPasswordGuard();
-    if (!unlocked) return; 
+async function a() {
+    const h = await b();
+    if (!h) return;
 
-    console.log("routing from URL...");
-    const params = new URLSearchParams(window.location.search);
-    const className = params.get("class");
-    const noteset = params.get("noteset");
+    const i = new URLSearchParams(window.location.search);
+    const j = i.get("class");
+    const k = i.get("noteset");
 
-    if (!className) {
-        console.log("loading homepage...");
-        loadClasses();
-        console.log("homepage loaded!...");
+    if (!j) {
+        d();
         return;
     }
 
-    if (!noteset) {
-        console.log("loading class page...");
-        setupPresence(className);
-        loadNotesets(className);
-        console.log("class page loaded!...");
+    if (!k) {
+        g(j);
+        e(j);
         return;
     }
 
-    console.log("loading noteset...");
-    setupPresence(className);
-    loadNoteset(noteset, className);
-    console.log("noteset loaded!...");
+    g(j);
+    f(k, j);
 }
 
 
 
-async function sha256(str) {
-    const encoder = new TextEncoder();
-    const data = encoder.encode(str);
-    const hashBuffer = await crypto.subtle.digest("SHA-256", data);
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    return hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
-}
 
-async function showPasswordGuard() {
-    const storedHash = "7d5a81efaff0a444b729e06ab3768a40ec82be5769c667b99810dfaeca84930a";
-
-    if (sessionStorage.getItem("unlocked") === "true") {
-        return true;
-    }
-
-    const content = document.getElementById("content");
-    content.innerHTML = `
-    <div id="pwWrapper" style="
-        height: 100vh;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    ">
-        <div style="width: 400px; text-align: center;">
-            <input id="pwInput" type="text" placeholder="what is my phone number"
-                style="width: 100%; margin-bottom: 10px;">
-            <p id="pwError" style="color: red; display: none;">Incorrect password</p>
-        </div>
-    </div>
-
-    `;
-
-    return new Promise(resolve => {
-
-        document.getElementById("pwInput").addEventListener("keydown", async (e) => {
-            if (e.key === "Enter") {
-                const input = e.target.value;
-                const hash = await sha256(input);
-
-                if (hash === storedHash) {
-                    sessionStorage.setItem("unlocked", "true");
-                    resolve(true);   // now in scope
-                } else {
-                    document.getElementById("pwError").style.display = "block";
-                }
-            }
-        });
-
-    });
-
-
-}
 
 
 
