@@ -18,6 +18,10 @@ function renderNotesetShell(className, notesetName, description) {
     return container;
 }
 
+function preprocess(md) {
+    return md.replace(/^(\s*)\* \s*$/gm, "$1* \u200B");
+}
+
 function transformMarkdown(html, className) {
     // 1. Replace {{answer}} with blanks
     html = html.replace(/\{\{(.*?)\}\}/g, (_, p1) =>
@@ -56,12 +60,20 @@ function transformMarkdown(html, className) {
         }
     );
 
-    // 5. Hide empty bullets
+    // 5. Hide markers on empty bullets
     html = html.replace(
-        /<li>\s*<ul>[\s\S]*?<\/ul>\s*<\/li>/g,
-        match => match.replace("<li>", `<li class="empty-li">`)
+        /<li>&ZeroWidthSpace;<\/li>/g,
+        `<li class="empty-li"></li>`
     );
 
+    // 6. Wrap tables in a scrollable container
+    html = html.replace(
+        /<table>/g,
+        `<div class="table-wrapper"><table>`
+    ).replace(
+        /<\/table>/g,
+        `</table></div>`
+    );
     return html;
 }
 

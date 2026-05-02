@@ -1,43 +1,12 @@
 * Important POSIX process C functions
-    * {{`getpid`}}: gets process ID. Ex: `pid_t my_pid = getpid(); printf(%d, (int) my_pid);`
-    * {{`fork`}}: creates a new (duplicate) process of the current one
+    * {{`getpid`}}: gets process ID.
+    * `fork`: creates {{a new (duplicate) process of the current one}}
     * {{`exec*`}}: replaces current program with new program
     * {{`waitpid`}}: wait for process to finish
-    * {{`exit`, `kill`}}: process destruction
+    * `exit`, `kill`: process destruction
     * There's also `posix_spawn` which is rarely used, but can be used to spawn new programs.
-* When `fork` is called, it's returned twice. Once in the {{parent}} process, where the return value is {{the child's pid}} and again in the {{child}} process, where the return value is {{zero}}.
+* When `fork` is called, it's returned twice. Once in the {{parent}} process, where the return value is {{the child's pid}}, and again in the {{child}} process, where the return value is {{zero}}.
     * Everything is duplicated from the parent to the child (eg. {{memory}}, {{file descriptors}}, {{registers}}), EXCEPT for {{pid}}.
-
-```
-int main() {
-    pid_t pid = fork();
-    if (pid == 0) {
-    printf("In child\n");
-} else {
-    printf("Child %d\n", pid);
-}
-    printf("Done!\n");
-}
-```
-Suppose the pid of the parent process is 99 and child is 100. Give two
-possible outputs (assume no crashes): (1) {{`Child 100 \n In child \n Done! \n Done!`}}, (2) {{`In child \n Done! \n Child 100 \n Done!`}}
-
-```
-int x = 0;
-int main() {
-    pid_t pid = fork();
-    int y = 0;
-    if (pid == 0) {
-        x += 1;
-        y += 2;
-    } else {
-        x += 3;
-        y += 4;
-    }
-    printf("%d %d\n", x, y);
-}
-```
-The two possible outputs are: (1) {{`1 2 \n 3 4`}} and (2) {{`3 4 \n 1 2`}}
 
 * "exec*": `int execv(const char *path, const char **argv)`
     * `*path`: {{new program to run}}
@@ -115,6 +84,36 @@ close(fd);
 * Sharing and unsharing seek pointers: a seek pointer is the offset inside an open file that tells the OS which byte will be read or written next.
     * How can you get two file descriptors to have two independent unshared seek pointers? {{Call `open()` twice on the same filename. You get two independent file descriptors, each with its own seek pointer}}.  
     * How can you get two file descriptors to share one seek pointer? {{Duplicate a file descriptor using `dup2()`. The new descriptor shares the same underlying open file description, including the seek pointer.}}  
+# Exercises
+```c
+int main() {
+    pid_t pid = fork();
+    if (pid == 0) {
+        printf("In child\n");
+    } else {
+        printf("Child %d\n", pid);
+    }
+    printf("Done!\n");
+}
+```
+* Consider the code above. Suppose the pid of the parent process is 99 and child is 100. Give two possible outputs (assume no crashes): (1) {{`Child 100 \n In child \n Done! \n Done!`}}, (2) {{`In child \n Done! \n Child 100 \n Done!`}}
+
+```c
+int x = 0;
+int main() {
+    pid_t pid = fork();
+    int y = 0;
+    if (pid == 0) {
+        x += 1;
+        y += 2;
+    } else {
+        x += 3;
+        y += 4;
+    }
+    printf("%d %d\n", x, y);
+}
+```
+The two possible outputs are: (1) {{`1 2 \n 3 4`}} and (2) {{`3 4 \n 1 2`}}
 
 * Exercise: In the code below, what is written to output.txt? {{`ABCD`}}
 ```

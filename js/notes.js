@@ -21,7 +21,7 @@ async function fetchDirectoryListing(path) {
 }
 
 async function fetchNotesetDescription(className, notesetName) {
-    const basePath = `notes/${encodeURIComponent(className)}/notesets/${encodeURIComponent(notesetName)}/`;
+    const basePath = `notes/${className}/notesets/${notesetName}/`;
     const files = await fetchDirectoryListing(basePath);
     const descFile = files.find(f => f.toLowerCase() === "desc.txt");
 

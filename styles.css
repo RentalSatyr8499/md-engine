@@ -227,3 +227,7 @@ li.empty-li::marker {
     font-size: .5rem;
 }
 
+.table-wrapper {
+    overflow-x: auto;
+    width: 100%;
+}

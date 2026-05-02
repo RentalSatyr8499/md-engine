@@ -1,5 +1,5 @@
 * Fill in the blank!
-| file extension | what is it used for? | language |
+| file extension | what is it? | language |
 |----------|----------|----------|
 | `.c`    | {{C source code}}   | {{C}}   |
 | `.h`    | {{C header file}}   |  {{C}}   |
@@ -25,8 +25,20 @@
     4. When *running* the executable, you must also tell it where to find the `.so` file. There are two ways to set the runtime path:
         * Specify an rpath at link time. For example, `clang -o exec main.o {{-Wl,-rpath,L/path/to/lib}}`
         * Set the {{`LD_LIBRARY_PATH` environment variable}} before running the program.
+* When you run `make` with no other parameters, the {{first}} rule in the `Makefile` is always executed.
+    * `make` reruns a command if and only if {{any prerequisite has been modified more recently than the target}}. After deciding a command should be rerun, `make` then ensures {{all prereqs are up to date}} before actually rerunning it.
+    * If you have a target that isn't actually a file, like `all` or `clean`, it's best practice to {{declare it as a `.PHONY` target}}.
+    * We can use macros to "allow easy swapping out of different compilers, compilation flags, etc" (ex. `CC = gcc` or `LDFLAGS = -Wall -pedantic -fsanitize=address`).  The syntax to use a macro is {{`$(MACRO_NAME)`}}.
+    * We can automatic variables and pattern rules to make writing build rules easier, too:
 
-Exercise:
+| rule | usage |
+|----------|----------|
+| `$@`    | {{target}}   |
+| `$<`    | {{first dependency}}   |
+| `$^`    | {{all dependencies}}   |
+| `%foo`    | {{anything ending in `foo`}}   |
+
+# Exercises
 ```
 a.c:
 void foo() { puts("A"); }
@@ -49,18 +61,5 @@ $ clang -c b.c -o b.o
 $ ar rcs libfoo.a b.o
 $ ./program
 ```
-This last line will output {{`A`}}, because {{static linking embeds the code into the executable, and you never rebuilt the executable after replacing the library}}.
-
-* When you run `make` with no other parameters, the {{first}} rule in the `Makefile` is always executed.
-    * `make` runs the command if and only if {{any prerequisite has been modified more recently than the target}}. Before doing this, it first ensures {{all prereqs are up to date}}.
-    * If you have a target that isn't actually a file, like `all` or `clean`, it's best practice to {{declare it as a `.PHONY` target}}.
-    * We can use macros to "allow easy swapping out of different compilers, compilation flags, etc" (ex. `CC = gcc` or `LDFLAGS = -Wall -pedantic -fsanitize=address`).  The syntax to use a macro is {{`$(MACRO_NAME)`}}.
-    * We can automatic variables and pattern rules to make writing build rules easier, too:
-
-| rule | usage |
-|----------|----------|
-| `$@`    | {{target}}   |
-| `$<`    | {{first dependency}}   |
-| `$^`    | {{all dependencies}}   |
-| `%foo`    | {{anything ending in `foo`}}   |
+* Consider the code above. The last line will output {{`A`}}, because {{static linking embeds the code into the executable, and we never rebuilt the executable after replacing the library}}.
 

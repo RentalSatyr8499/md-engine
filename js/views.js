@@ -80,7 +80,7 @@ async function loadNoteset(className, notesetName) {
         container.appendChild(header);
         container.appendChild(content);
 
-        content.innerHTML = transformMarkdown(marked.parse(md), className);
+        content.innerHTML = transformMarkdown(marked.parse(preprocess(md)), className);
         content.querySelectorAll("pre code").forEach(block => hljs.highlightElement(block));
     }
 

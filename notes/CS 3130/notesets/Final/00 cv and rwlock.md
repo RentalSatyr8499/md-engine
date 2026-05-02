@@ -1,53 +1,28 @@
-* While locks give mutual exclusion, alone, they don’t let threads wait for something to become true. For that, we can use {{condition variables}}.
-    *  A "monitor" is a structured bundle containing: a lock, shared data, zero or more condition variables, and operations that manipulate the shared data. It also keeps track of queues for {{the lock and each condition variable}}.
-    * `wait(cv, lock)`: the calling thread releases the lock and enters the queue for {{`cv`}}. Once popped from the queue, the calling thread is automatically given the lock back.
-    * `signal(cv)`: wakes {{one waiting thread}}.
-    * `broadcast(cv)`: wakes {{all waiting threads}}.
-* Consider a real-world situation where one entity produces data, that another entity consumes. One way to implement this functionality is to allow the producer to push data to a buffer that the consumer then pops and reads. But producers and consumers might run at different speeds. A consumer might be too fast and find the buffer empty; a producer might be too fast and (in the bounded case) find the buffer full. Condition variables let each side wait for the situation it needs.
-    * Unbounded queue: {{producers}} never need to wait; only {{consumers}} do.
-        * Producer logic: (1) {{acquire lock}}, (2) {{enqueue}} data, (3) signal {{`data_ready`}}, (4) unlock
-        * Consumer logic: (1) {{acquire lock}}, (2) while {{the buffer is empty}}, wait on {{`data_ready`}}, (3) {{dequeue}} data, (4) unlock
-    * Bounded queue: producers need to wait for the queue to {{have space}}, and consumers need to wait for the queue to {{have data}}.
-        * Producer logic: (1) {{acquire lock}}, (2) while buffer is {{full}}, wait on {{`space_ready`}}, (3) {{enqueue}} data, (4) unlock
-        * Consumer logic: (1) {{acquire lock}}, (2) while buffer is {{empty}}, wait on {{`data_ready`}}, (3) {{dequeue}} data, (4) unlock
-
-```c
-// Bounded queue example
-void Produce(item_type item) {
-    pthread_mutex_lock(&lock);
-    while (buffer.full()) {
-        pthread_cond_wait(&space_ready, &lock);
-    }
-    buffer.enqueue(item);
-    pthread_cond_signal(&data_ready);
-    pthread_mutex_unlock(&lock);
-}
-
-item_type Consume() {
-    pthread_mutex_lock(&lock);
-    while (buffer.empty()) {
-        pthread_cond_wait(&data_ready, &lock);
-    }
-    item_type item = buffer.dequeue();
-    pthread_cond_signal(&space_ready);
-    pthread_mutex_unlock(&lock);
-    return item;
-}
-```
-* 
+* Locks allow us to implement mutual exclusion. But they are not versatile enough to allow threads to "wait for something to become true". For that, we can use {{condition variables}}.
+    *  A "monitor" is a structured bundle containing: (1) a {{lock}}, (2) {{condition variable}}s, and (3) shared data + ways to manipulate that shared data. It also keeps track of queues for each condition variable.
+    * `wait(cv, lock)`: this causes the calling thread to (1) {{release the lock}} and (2) {{enter the queue for `cv`}}. Once popped from the queue, the calling thread automatically {{recieves the lock back}}.
+    * `signal(cv)`: wakes {{one waiting thread in `cv`'s queue}}.
+    * `broadcast(cv)`: wakes {{all waiting threads in `cv`'s queue}}.
+* One way to implement a situation where one entity produces data that another entity consumes is for the producer to push to a buffer that the consumer pops from. But producers and consumers might run at different speeds (a consumer might find the buffer empty and a producer might find the buffer full). Condition variables let each side wait for the situation it needs. 
+    * "Unbounded queue:" {{producers}} never need to wait; only {{consumers}} do. There's only one condition variable: `data_ready`.
+        * Producer logic: (1) {{acquire lock}}, (2) {{enqueue}} data, (3) {{signal the queue's `data_ready`}}, (4) unlock
+        * Consumer logic: (1) {{acquire lock}}, (2) while {{the buffer is empty}}, {{wait on signal the queue's `data_ready`}}, (3) {{dequeue}} data, (4) unlock
+    * "Bounded queue": producers need to wait for the queue to {{have space}}, and consumers need to wait for the queue to {{have data}}. There's two condition variables: `data_ready` and `space_ready`.
+        * Producer logic: (1) {{acquire lock}}, (2) while buffer is {{full}}, {{wait on `space_ready`}}, (3) {{enqueue}} data, (4) unlock
+        * Consumer logic: (1) {{acquire lock}}, (2) while buffer is {{empty}}, {{wait on `data_ready`}}, (3) {{dequeue}} data, (4) unlock
     * A while loop is used in both unbounded and bounded queues to constantly check on conditional variables. This is essential because {{the buffer's state might change after waking (spurious wakeups)}}.
     * Both unbounded and bounded buffers also use `signal` instead of `broadcast`. This is because {{only one waiting thread can really make progress on `data_ready` or `space_ready`. And it's expensive to wake everyone up for no reason}}.
-* "Monitors rules of thumb"
+* Monitors rules of thumb!
     * Never touch shared data without {{holding the lock}}, and keep the lock held for {{the entire operation}}.
-    * Create a separate {{condvar}} for every kind of scenario waited for.
-    * Always wrap the cond_wait call in a {{loop}}.
+    * Create a separate {{conditional variable}} for every kind of scenario waited for.
+    * Always wrap the `cond_wait` call in a {{loop}}.
     * {{`broadcast` or `signal`}} the condition variable every time you change the buffer/data.
-    * While technically correct, it impact performance if you...
+    * While technically correct, it impacts performance if you...
         * `broadcast` when {{just `signal`}} would work
         * {{`broadcast` or `signal`}} when nothing changed
-        * Use one condvar for multiple conditions
-* POSIX implementation of monitors: 
+        * Use one condvar for multiple conditions 
 ```c
+/* POSIX implementation of monitors */
 // declaration
 pthread_mutex_t mutex;
 pthread_cond_t cv;
@@ -68,16 +43,16 @@ pthread_mutex_destroy(&mutex);
 |----|----|----|----|
 |read lock|You can pick up a read lock if and only if {{no writer is active}}|{{`Y`}}|{{`N`}}|
 |write lock|You can pick up a write lock if and only if {{no readers and no writers are active}}|{{`N`}}|{{`N`}}|
-* 
-    * pthread implements RWLocks. 
-```
+
+```c
+/* pthread implements RWLocks. */
 pthread_rwlock_rdlock(&rwlock);   // acquire read lock
 pthread_rwlock_wrlock(&rwlock);   // acquire write lock
 pthread_rwlock_unlock(&rwlock);   // release either
 ```
 * A "{{transaction}}" is a set of operations that occurs atomically, ie, the operations happen all at once. Conceptually, this could mean two things: 
     * A "durable" transaction is one where {{if the system crashes, the transaction is either fully applied or not applied at all}}.
-    * A "consistent" transaction is one where {{no other thread sees intermediate states}}. Two ways to implement this are: (1) {{run transactions in serial order}}, and (2) {{lock everything the transaction touches in a consistent global order}}.
+    * A "consistent" transaction is one where {{no other thread sees intermediate states}}. Two ways to implement this are: (1) run transactions in {{serial}} order, and (2) lock everything the transaction touches in a {{consistent global}} order.
 
 
 # Exercises
@@ -105,7 +80,7 @@ void Finish() { // called in thread B
 ```
 * Exercise: Consider the code above. Suppose thread A acquires `lock` first.
     * At what point in the code must thread A reach before thread B will run line 8? {{line 3}}
-    * When thread A is executing line 5, who has `lock`? When did they acquire it? {{thread A has the lock because it was given back to thread A once `pthread_cond_wait()` returned}}.
+    * When thread A is executing line 5, who has `lock`? When did they acquire it? {{thread A has the lock because it was given back to thread A once `pthread_cond_wait()` returned, ie after line 10 is done executing}}.
     * Which executes first, line 6 or line 10? {{line 10}}
 
 ```c
@@ -163,7 +138,7 @@ void BarrierWait(BarrierInfo *b) {
     * Blank 1: {{`pthread_cond_t cv;`}}
     * Blank 2: {{`pthread_cond_signal(&b->cv);`}}
     * Blank 3: {{`while(b->number_reached != b->total_threads)`}}
-    * Blank 4:{{ `pthread_cond_wait(&b->cv, &b->lock);`}}
+    * Blank 4: {{`pthread_cond_wait(&b->cv, &b->lock);`}}
 
 ```c
 pthread_rwlock_t lock;
