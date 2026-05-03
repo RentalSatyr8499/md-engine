@@ -47,8 +47,8 @@ async function showPasswordGuard() {
 }
 
 async function routeFromURL() {
-    const unlocked = await showPasswordGuard();
-    if (!unlocked) return;
+    // const unlocked = await showPasswordGuard();
+    // if (!unlocked) return;
 
     const params = new URLSearchParams(window.location.search);
     const className = params.get("class");
