@@ -28,8 +28,8 @@
 if (x < array1_size) // predictor is mistrained to think this is true
     y = array2[array1[x] * 4096]; // speculatively executed
 ```
-* 
-    * 
+* %%invis%%
+    * %%invis%%
         * Any code that follows the above pattern (and is on a system with no mitigations against Spectre) is vulnerable to a Spectre attack.
         * Not all vulnerable code will look exactly like this, but they all follow the general pattern of conditional branching and using values from one table to index into another table.
         * How does the size of array entries (ex. 4-byte ints, 1-byte chars) affect the Spectre attack? Answer: {{You can only leak data in sizes as large as a single array entry}}.
