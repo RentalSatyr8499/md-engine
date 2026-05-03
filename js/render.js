@@ -74,8 +74,62 @@ function transformMarkdown(html, className) {
         /<\/table>/g,
         `</table></div>`
     );
+    
+    // 7. Left-align cells marked with <!left>
+    html = html.replace(
+        /<(td|th)>%%left%%\s*/g,
+        `<$1 style="text-align: left;">`
+    );
+    
+    // 8. Collapse %%invis%% list items
+    html = html.replace(
+        /<li>(.*?)%%invis%%/g,
+        `<li class="empty-li">$1`
+    );
     return html;
 }
+
+function getPageState() {
+    const contents = document.querySelectorAll(".collapsible-content");
+    return [...contents].some(c => c.classList.contains("open")) ? "uncollapsed" : "collapsed";
+}
+
+function updateHamburger() {
+    const toggle = document.querySelector(".main-nav-toggle");
+    if (!toggle) return;
+    if (getPageState() === "uncollapsed") {
+        toggle.classList.add("active-menu");
+    } else {
+        toggle.classList.remove("active-menu");
+    }
+}
+
+function collapseAll() {
+    document.querySelectorAll(".collapsible-content.open").forEach(content => {
+        content.classList.remove("open");
+        content.style.height = content.scrollHeight + "px";
+        requestAnimationFrame(() => { content.style.height = "0px"; });
+    });
+}
+
+function uncollapsAll() {
+    document.querySelectorAll(".collapsible-content:not(.open)").forEach(content => {
+        content.classList.add("open");
+        content.style.height = content.scrollHeight + "px";
+        setTimeout(() => { content.style.height = "auto"; }, 300);
+    });
+}
+
+function toggleNav(event) {
+    event.preventDefault();
+    if (getPageState() === "uncollapsed") {
+        collapseAll();
+    } else {
+        uncollapsAll();
+    }
+    updateHamburger();
+}
+
 
 function applyCollapsibleBehavior(header, content) {
     header.onclick = () => {
@@ -86,10 +140,10 @@ function applyCollapsibleBehavior(header, content) {
             setTimeout(() => (content.style.height = "auto"), 300);
         } else {
             content.style.height = content.scrollHeight + "px";
-            requestAnimationFrame(() => {
-                content.style.height = "0px";
-            });
+            requestAnimationFrame(() => { content.style.height = "0px"; });
         }
+
+        updateHamburger(); // <-- add this line
     };
 }
 

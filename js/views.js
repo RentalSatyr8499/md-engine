@@ -1,3 +1,4 @@
+
 async function loadClasses() {
     document.title = config.siteTitle;
 
@@ -25,6 +26,8 @@ async function loadClasses() {
     });
 
     document.getElementById("reveal-toggle").style.display = "none";
+    document.getElementById("hamburger").style.display = "none";
+
 }
 
 async function loadNotesets(className) {
@@ -54,6 +57,7 @@ async function loadNotesets(className) {
     });
 
     document.getElementById("reveal-toggle").style.display = "none";
+    document.getElementById("hamburger").style.display = "none";
 }
 
 async function loadNoteset(className, notesetName) {
@@ -85,5 +89,7 @@ async function loadNoteset(className, notesetName) {
     }
 
     document.getElementById("reveal-toggle").style.display = "flex";
+    document.getElementById("hamburger").style.display = "flex";
+
     setupRevealToggle();
 }
