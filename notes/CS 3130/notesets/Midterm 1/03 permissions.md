@@ -1,21 +1,22 @@
-* Every process has a {{user ID}}, which the kernel uses to decide what the process is allowed to do. 
+* Every process has a {{user ID}}, which the kernel uses to identify unique processes, allowing it to remember what each the process is allowed to do. 
     * You can retrieve the “effective user ID” in C with `{{geteuid}}()`.
     * Processes also have a group ID, retrieved in C with `{{getegid}}()`.
     * During login, a program checks the password, then changes the {{user IDs of the process}} to match the authenticated user.
-* Every file has permissions associated with it called POSIX permissions. There are {{9}} bits: three sets of {{`r`ead, `w`rite, `e`xecute}} for {{user (`u`)}}, {{group (`g`)}}, and {{other (`o`)}}.
+* Every file has permissions associated with it called POSIX permissions. There are {{9}} bits: three sets of {{`r`ead, `w`rite, `e`xecute}}. One set is for the {{user (`u`)}}, another for {{group (`g`)}}, and another for {{other (`o`)}}.
     * For example, `700` translates to {{user rwx, group ---, other ---}}.
     * For example, `451` translates to {{user r--, group r-x, other --x}}.
-    * `chmod` can set exact permissions. For example, if you wanted to give only the user permissions to read, write, and execute `myFile`, run {{`chmod 700 file`}} or {{`chmod u+rwx myFile`}}.
+    * `chmod` can set exact permissions. For example, if you wanted to give only the user permissions to read, write, and execute `myFile`, run {{`chmod 700 myFile`}} or {{`chmod u+rwx myFile`}}.
 * POSIX Access Control Lists ("ACL"s) allow more flexible rules than the basic user/group/other bits, because you can set perms for {{multiple different users and multiple different groups by name}}. We can modify ACLs using the  {{`setfacl -m`}} command. 
     * For example, if I wanted to give user `mst3k` read and write permissions to `myFile`, I would run {{`setfacl -m u:mst3k:rw myFile`}}.
     * For example, if I wanted to give group `lab_fall2019` read permissions to `myFile`, I would run {{`setfacl -m g:lab_fall2019:r myFile`}}.
     * For example, if I wanted to remove user `mst3k` from the permission list, I would run {{`setfacl -x u:mst3k`}}.
-* User ID 0 is special kind of user called the {{superuser}}. This user automatically {{has almost all permission checks}}.
-    * Superuser is still user mode (not kernel mode)! Kernel mode is a hardware privilege level used only by the OS. To describe the relationship between superuser and kernel, you could say: code running as the {{kernel}} can do everything code running as {{root/superuser}} can do, and more.
-    * `sudo` runs a program with superuser permissions. It is able to do this because it has the {{setuid}} permission.
-        * SetUID lets the user run an executable with the permissions of the executable's owner. For example, executable `myExe` is owned by `mst3k` and has setuid permissions, then when `xaq7pj` runs `./myExe`, the program actually runs as {{`mst3k`, not as `xaq7pj`}}.
-        * `sudo` is an executable with `setuid` who is owned by {{the superuser!}}. That means anyone who runs `sudo` runs it as {{root, aka the superuser}}.
-        * In general, setuid programs must be responsible for {{carefully checking which user invoked them}}.
+* User ID 0 is special kind of user called the {{superuser}}. This user automatically {{passes almost all permission checks}}.
+    * True or false: superuser and kernel mode are two different names for the same thing. Answer: {{false}}
+    * Fill in the blanks with either "kernel" or "superuser": code running as the {{kernel}} can do everything code running as {{superuser}} can do, and more.
+    * `sudo` runs a program with superuser permissions. It is able to do this because {{it has the setuid permission and is owned by root}}.
+        * setUID lets the user run an executable with the permissions of the executable's owner. For example, executable `myExe` is owned by `mst3k` and has setuid permissions, then when `xaq7pj` runs `./myExe`, the program actually runs as {{`mst3k`, not as `xaq7pj`}}.
+        * `sudo` is an executable with `setuid` who is owned by {{the superuser}}. That means anyone who runs `sudo` runs it as {{root}}.
+        * In general, setuid programs must be responsible for carefully checking which user invoked them.
 * Define "privilege escalation": {{unintended vulnerabilities that allow a someone to get more privileges. Privilege escalation is always a bad thing}}.
 
 * Exerciseee: Which of the following is possible to achieve in theory using **user accounts**? (Even if OSes don't do it often, if it's still possible, select yes)

@@ -227,3 +227,88 @@ li.empty-li::marker {
     font-size: .5rem;
 }
 
+.table-wrapper {
+    overflow-x: auto;
+    width: 100%;
+}
+
+.left-align {
+    text-align: left !important;
+}
+
+.hamburger {
+  --size: 43px;
+
+  display: inline-block;
+  height: calc(var(--size) * 0.93);
+  position: fixed;
+  bottom: 85px;
+  right: 66px;
+  opacity: 0.8;
+  transition: opacity 0.2s;
+  margin-right: 0;
+
+  &:hover {
+    opacity: 1;
+  }
+
+  a.main-nav-toggle {
+    display: block;
+    width: var(--size);
+    height: calc(var(--size) * 0.57);
+    position: absolute;
+    top: 50%;
+    left: 0;
+    transform: translateY(-50%);
+
+    &:after,
+    &:before {
+      content: '';
+      position: absolute;
+      top: 0;
+      height: 0;
+      border-bottom: calc(var(--size) * 0.14) solid #000;
+      width: 80%;
+      left: 0;
+      right: 0;
+      transition: all ease-out 0.3s;
+      border-radius: 2px; 
+    }
+
+    &:after {
+      top: 100%;
+    }
+
+    i {
+      display: block;
+      text-indent: 100%;
+      overflow: hidden;
+      white-space: nowrap;
+      height: calc(var(--size) * 0.14);
+      background-color: #000;
+      width: 80%;
+      position: absolute;
+      top: 50%;
+      transition: all ease-out 0.1s;
+      border-radius: 2px; 
+    }
+
+    &.active-menu {
+      &:after {
+        transform: rotate(-45deg);
+        transform-origin: center;
+        top: 50%;
+      }
+
+      &:before {
+        transform: rotate(45deg);
+        transform-origin: center;
+        top: 50%;
+      }
+
+      i {
+        opacity: 0;
+      }
+    }
+  }
+}

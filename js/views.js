@@ -1,79 +1,73 @@
-async function d() {
-    document.title = "MD Engine";
+
+async function loadClasses() {
+    document.title = config.siteTitle;
+
     const classDirs = await fetchDirectoryListing("notes/");
     const container = document.getElementById("content");
+
     container.innerHTML = `
         <div id="main-container">
             <h1>${config.siteTitle}</h1>
         </div>
     `;
 
-    console.log(`loading the following class directories: ${classDirs}`)
+    const main = document.getElementById("main-container");
 
-    classDirs.forEach(dir => {
-        const name = dir.replace("/", "");
-
+    classDirs.forEach(name => {
+        name = name.replace(/\/$/, "");
         const item = document.createElement("div");
         item.className = "noteset-item";
         item.textContent = name;
-
         item.onclick = () => {
             history.pushState({}, "", `/?class=${encodeURIComponent(name)}`);
             a();
         };
-
-
-        document.getElementById("main-container").appendChild(item);
+        main.appendChild(item);
     });
 
     document.getElementById("reveal-toggle").style.display = "none";
-    document.getElementById("presence-indicator").style.display = "none";
+    document.getElementById("hamburger").style.display = "none";
+
 }
 
-async function e(className) { 
-    document.title = `${className}: notesets`;
+async function loadNotesets(className) {
+    document.title = className;
 
-    const notesetDirs = await fetchDirectoryListing(`notes/${className}/notesets/`); 
-    
-
+    const notesetDirs = await fetchDirectoryListing(`notes/${className}/notesets/`);
     const container = document.getElementById("content");
+
     container.innerHTML = `
         <div id="main-container">
             <h1>${className}</h1>
         </div>
     `;
 
-    notesetDirs.forEach(dir => {
-        const name = dir.replace("/", "");
+    const main = document.getElementById("main-container");
 
+    notesetDirs.forEach(name => {
+        name = name.replace(/\/$/, "");
         const item = document.createElement("div");
         item.className = "noteset-item";
         item.textContent = name;
-
         item.onclick = () => {
-            history.pushState(
-                {},
-                "",
-                `/?class=${encodeURIComponent(className)}&noteset=${encodeURIComponent(name)}`
-            );
-            a();
+            history.pushState({}, "", `/?class=${encodeURIComponent(className)}&noteset=${encodeURIComponent(name)}`);
+            routeFromURL();
         };
-
-        document.getElementById("main-container").appendChild(item);
-
+        main.appendChild(item);
     });
 
-    // document.getElementById("presence-indicator").style.display = "flex";
     document.getElementById("reveal-toggle").style.display = "none";
-    g(className);
+    document.getElementById("hamburger").style.display = "none";
 }
 
-async function f(name, className) {
-    document.title = `${className} | ${name}`;
-    const container = await buildNotesetUI(name, className);
+async function loadNoteset(className, notesetName) {
+    document.title = `${className} | ${notesetName}`;
 
-    const files = await loadMarkdownFiles(name, className);
-    document.querySelector("#loading-message").remove();
+    const description = await fetchNotesetDescription(className, notesetName);
+    const container = renderNotesetShell(className, notesetName, description);
+
+    const files = await loadMarkdownFiles(className, notesetName);
+    document.getElementById("loading-message").remove();
 
     for (const { file, md } of files) {
         const noteTitle = file.slice(3).replace(".md", "");
@@ -81,28 +75,22 @@ async function f(name, className) {
         const header = document.createElement("h2");
         header.textContent = noteTitle;
         header.className = "collapsible-header";
-        header.title = "click to toggle collapse"
+        header.title = "click to toggle collapse";
 
         const content = document.createElement("div");
         content.className = "note-content collapsible-content";
 
         applyCollapsibleBehavior(header, content);
-
         container.appendChild(header);
         container.appendChild(content);
 
-        let html = marked.parse(md);
-        html = transformMarkdown(html, className, name);
-
-        content.innerHTML = html;
-
-        content.querySelectorAll("pre code").forEach(block => {
-            hljs.highlightElement(block);
-        });
+        content.innerHTML = transformMarkdown(marked.parse(preprocess(md)), className);
+        content.querySelectorAll("pre code").forEach(block => hljs.highlightElement(block));
     }
 
-    // document.getElementById("presence-indicator").style.display = "flex";
     document.getElementById("reveal-toggle").style.display = "flex";
+    document.getElementById("hamburger").style.display = "flex";
+
     setupRevealToggle();
 }
 

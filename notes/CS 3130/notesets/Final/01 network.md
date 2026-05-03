@@ -20,17 +20,18 @@
 | waiting for each ACK before sending the next packet wastes time | it's just slow | {{use a transmission window}} | {{sender transmits a window of N packets, then waits for ACKs for all N packets before moving on to the next window}}|
 * The two transport-layer protocols we learn about in this class are {{TCP}} and {{UDP}}. Fill out the table below. (I'm really into tables these days.)
 ||TCP ("make it *look like* a clean stream of bytes")|UDP ("just expose the raw network")|
+|---|---|---|
 |is transmission reliable?|{{`Y`}}|{{`N`}}|
 |what size of data can be sent via this protocol?|{{lots of data}}|{{short messages only}}|
 |under this protocol, can it be guaranteed that `write(fd, "a", 1); write(fd, "b", 1) == write(fd, "ab", 2)`?|{{`Y`}}|{{`N`}}|
 |under this protocol, is it possible for multiple sockets to talk to one program?|{{`N`}}|{{`Y`}}|
-|under this protocol, what does it mean to "connect"?{{|the server has responded and the handshake was successful}}|{{simply that the default destination has been set}}|
+|under this protocol, what does it mean to "connect"?|{{the server has responded and the handshake was successful}}|{{simply that the default destination has been set}}|
 * The two network-layer protocols we learn about in this class are {{IPv4}} and {{IPv6}}. 
     * For IPv4: Addresses are in {{32}} bits. There are {{four}} parts to the address, which are {{8}} bits each. Each part is expressed in {{decimal}} form and separated by {{dots (.)}}. 
     * For IPv6: Addresses are in {{128}} bits. There are {{eight}} parts to the address, which are {{16}} bits each. Each part is expressed in {{hex}} form and separated by {{colons (:)}}. 
         * In IPv6, a double colon (::) means {{shorthand for a string of zeroes}}.
-    * Why do we have both protocols? When IPv4 addresses ran out, people came up with IPv6. But it requires updating every device and router, which is slow. {{NAT (Network Address Translation)}} works around this drawback by letting many private machines share {{one public IPv4 address}}.
-        * A router rewrites many private addresses to a single public address, tracking the mapping in a table containing the columns: {{remote IP:remote port}}, {{public-facing port number}}, {{private ip}}, {{private port number}}. 
+    * Why do we have both protocols? When IPv4 addresses ran out, people came up with IPv6. But it requires updating every device and router, which is slow. So we use "{{NAT (Network Address Translation)}}", which works around this drawback by letting many private machines share {{one public IPv4 address}}.
+        * NAT works like this: A router rewrites many private addresses to a single public address, tracking the mapping in a table containing the columns: {{remote IP:remote port}}, {{public-facing port number}}, {{private ip}}, {{private port number}}. 
             * Certain IPv4 address blocks are reserved to be used as inside IPs only, such as `192.168.X.X`.
         * The "NAT illusion": From inside the network, it looks like {{you’re talking directly to the outside world}}; from outside, it looks like {{all internal machines are one device}}.
         * Reiss calls NAT a “hack” because it breaks the end‑to‑end model of the Internet, but it’s a practical necessity until IPv6 adoption is universal.
@@ -80,4 +81,4 @@
 |`https://kytos02.cs.virginia.edu:443/cs3130-spring2023/quizzes/quiz.php?qid=02#q2`|{{`https`}}|{{`kytos02.cs.virginia.edu`}}|{{N/A}}|{{`443`}}|{{`cs3130-spring2023/quizzes/quiz.php`}}|{{`qid=02`}}|{{`q2`}}|{{`Y`}}|
 |`sftp://cr4bd@portal.cs.virginia.edu/u/cr4bd/file.txt`|{{`sftp`}}|{{`portal.cs.virginia.edu`}}|{{`cr4bd`}}|{{N/A}}|{{`u/cr4bd/file.txt`}}|{{N/A}}|{{N/A}}|{{`Y`}}|
 |`tel:+1-434-982-2200`|{{`tel`}}|{{`+1-434-982-2200`}}|{{N/A}}|{{N/A}}|{{N/A}}|{{N/A}}|{{N/A}}|{{`N`}}|
-|`/~cr4bd/3130/S2023`|{{N/A}}|{{N/A}}|{{N/A}}|{{N/A}}|{{`/~cr4bd/3130/S2023N/A`}}|{{N/A}}|{{N/A}}|{{`N`}}|
+|`/~cr4bd/3130/S2023`|{{N/A}}|{{N/A}}|{{N/A}}|{{N/A}}|{{`/~cr4bd/3130/S2023`}}|{{N/A}}|{{N/A}}|{{`N`}}|

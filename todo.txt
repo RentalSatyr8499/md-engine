@@ -1,9 +1,6 @@
-- horizontal scroll on tables too long
-- collapse/expand all headers
 - dynamic OG tags
 - shuffle table
 - shuffle blank length
-- bug where l2 bullets (under empty l1 bullets) dont show up after tables or code blocks
 - description for class 
 - description for noteset (inherited first part from class)
 - right click to flag blank

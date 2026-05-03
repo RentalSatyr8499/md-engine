@@ -1,7 +1,7 @@
-* The idea behind {{kernel}} mode is that the OS tells the hardware to only allow OS-written code to access the hard drive. 
+* Only {{OS-written}} code is allowed to access the hard drive. 
     * This allows us to enforce restrictions on individual programs, preventing them from doing things like {{reading other user's files, modifying OS's memory, or hanging the entire system}}.
     * We keep track of whether we're in kernel mode (aka {{privileged}} or {{supervisor}} mode) using an {{extra one-bit register}}. Non-kernel mode is called {{user mode}}.
-* The {{system call interface}} protects privileged actions through a collaboration between the kernel and the hardware. The `syscall` instruction causes the CPU to switch to {{kernel mode}} and jump to an OS‑designated entry point.  The kernel then checks what the program wants and ensures {{the request is safe}} before performing it.  
+*  The {{`syscall`}} instruction causes the CPU to switch to kernel mode and jump to an OS‑designated entry point.  The kernel then checks what the program wants and ensures {{the request is safe}} before performing it.  
     * The `syscall` calling convention is as follows: 
         * `%rax` contains the {{system call number (which action is being requested)}}  
         * the arguments of the system call go in  {{`%rdi`, `%rsi`, `%rdx`, `%r10`, `%r8`, `%r9`}} 
@@ -12,7 +12,7 @@
         * {{`execve`}}: run a program in the current process
         * {{`open`, `read`, `write`}}: access and modify files
         * {{`_exit`}}: terminate a process
-        * {{`socket`, `accept`, `getpeername`}}: socket‑related operations  
+        * `socket`, `accept`, `getpeername`: socket‑related operations  
     * If the kernel recognizes that a `syscall` will be slow (ex. waiting for a keypress), the kernel will {{do something else for a while and later return to the program}}.  
     * If the syscall ends the program (ex, `exit`), the kernel will {{simply run something else afterward and not return to the original process}}.  
     * Together, the system call interface and kernel mode boundary ensure that users can't read other users’ data, modify OS memory, or hang the entire system by giving each program its own {{address space}} and preventing each program from accessing {{memory not mapped for it}}.  
@@ -24,21 +24,22 @@
 | Faults    | {{unusual program/software behavior, ex. segfault}}   | {{sync}}   |
 | Interrupts    | {{external events, ex. IO devices}}   | {{async}}   |
 
-
-
 * The difference between sync and async: synchronous exceptions are {{triggered by the current program}}, while asynchronous exceptions are {{triggered by external events}}.
-* The OS uses {{exceptions (like timer interrupts)}} to regain control and perform a {{context switch}}. This involves: (1) saving the old program’s {{registers, program counter, and address mapping}}, and (2) load another program’s saved {{context}}. This is what allows multiple programs to run "at once", also called {{"time-multiplexing"}}.
-    * Exercise: which of the following is saved from the old program before a context switch? 
-        * the top-level virtual page table: {{N}}
-        * the set of open files and sockets: {{Y}}
-        * the page table base register: {{Y}}
-        * the PC (program counter, eg %rip): {{Y}}
-        * program register contents: {{Y}}
-        * all user-mode physical pages: {{N}}
-        * all allocated intermediate page tables: {{N}}
+* The OS uses {{exceptions (like timer interrupts)}} to regain control and perform a context switch. 
+    * Context switches involve: (1) saving the old program’s {{"context" (ex. registers, program counter, address mapping)}}, and (2) load another program’s saved {{context}}. This is what allows multiple programs to run "at once", also called {{"time-multiplexing"}}.
     * When stuff is saved from the old program before a context switch, it is saved in {{kernel memory, or OS memory. NOT CPU registers}}.
     * Each program has its own distinct register values and stack state. We keep track of these varying states using {{threads}}.
     * "Process": {{the thread and address space associated with an action we're trying to carry out}}. Processes are under the illusion of having their own dedicated {{machine}}. The process's thread(s) give the illusion of {{"dedicated machine's" CPU}}, while the process's virtual address space gives the illusion of the {{"dedicated machine's" memory}}.
+
+# Exercises
+* Exercise: which of the following is saved from the old program before a context switch? 
+    * the top-level virtual page table: {{N}}
+    * the set of open files and sockets: {{Y}}
+    * the page table base register: {{Y}}
+    * the PC (program counter, eg %rip): {{Y}}
+    * program register contents: {{Y}}
+    * all user-mode physical pages: {{N}}
+    * all allocated intermediate page tables: {{N}}
 
 |Action| Requires exception? | Requires context switch? |
 |----------|----------|----------|

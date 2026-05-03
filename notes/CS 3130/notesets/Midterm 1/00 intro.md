@@ -17,7 +17,7 @@
 | link    | {{coordinates access to the shared medium (wire or radio)}}   | {{Ethernet, Wi‑Fi}}  |
 | physical    | {{encodes bits onto the wire or radio}}   | {{copper wire, bluetooth}}  |
 
-*  
+*  %%invis%%
     * DNS is a naming system that maps {{human-readable names}} (ex. www.virginia.edu) to {{machine-usable IP addresses}} (ex. 128.143.22.36).
     * {{DHCP}} gives your machine an IP address (and other config).
 * {{Caching}} is an optimization where the CPU keeps data in faster/closer storage so it doesn’t have to wait for slow main memory.

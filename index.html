@@ -24,24 +24,22 @@
             "secondsUntilIdle": 60
         };
     </script>
-    <script src="./js/presence.js"></script>
-    <script src="./js/utils.js"></script>
+    <script src="./js/notes.js"></script>
+    <script src="./js/render.js"></script>
     <script src="./js/views.js"></script>
+    <script src="./js/router.js"></script>
     
     <div id="reveal-toggle" title="toggle all fill-in-the-blanks" style="display: none;">
         <img id="revealIcon" src="./assets/eye-open.png">
     </div>
-    <div id="presence-indicator" title="how many people are studying rn" style="display: none;">
-        <img src="./assets/online.png">
-        <p id="numOnline">0</p>
-        <p> | </p>
-        <img src="./assets/idle.png">
-        <p id="numIdle">0</p>
+    <div class="hamburger" id="hamburger" title="collapse or uncollapse all headings">
+        <a class="main-nav-toggle" href="#" onclick="toggleNav(event)">
+            <i></i>
+        </a>
     </div>
 
     <script>
-        a();
-        window.onpopstate = a;
+        routeFromURL();
     </script>
 </body>
 </html>

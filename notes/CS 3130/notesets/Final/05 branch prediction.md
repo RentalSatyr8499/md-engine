@@ -1,20 +1,20 @@
-* Branch prediction matters because {{modern out‑of‑order CPUs fetch and speculatively execute instructions before knowing whether a branch is taken}}. A misprediction wastes {{cycles (time)}}.
+* Good branch prediction matters because {{modern out‑of‑order CPUs fetch and speculatively execute instructions before knowing whether a branch is taken}}. A misprediction wastes {{cycles (time)}}.
 * "Static" prediction: follows a simple rule where {{backwards}} jumps are taken and {{forward}} jumps are not. 
     * Backward branches usually mean {{loops}}, which is why the predict is taken.
     * Forward branches usually mean {{conditionals}}, which is why the predict is not taken.
-* "1-bit" predictor: for each branch, this strategy remembers whether it was taken last time, and predicts the same for the next time.
-    * Predictions (or last results) are typically stored in {{a table indexed by hashed PC bits}}. So given the memory address of a `jmp` instruction, to store the prediction/last result of that instruction, we might: 
+* "{{1-bit}}" predictor: for each branch, this strategy remembers whether it was taken last time, and predicts the same for the next time.
+    * Predictions (or last results) are typically stored in {{a table indexed by hashed address bits}}. So given the memory address of a `jmp` instruction, to store the prediction/last result of that instruction, we might: 
         1. Take {{bits 4-7}} of the memory address
         2. {{Hash those bits}}
         3. Use the result as the {{index}} in the table where we store the memory address and its prediction
-* "2-bit saturating counter": similar to 1-bit predictors, but require require {{two consecutive mispredictions}} to flip direction instead.
+* "2-bit saturating counter": similar to 1-bit predictors, but require {{two consecutive mispredictions}} to flip direction instead.
     * The table would store 2-bit values to indicate a history going back as far as {{two}} predicts/results.
-        * `00`: two most recent iterations have not been taken 
-        * `01`: the most recent iteration was taken, and the one before not taken
-        * `10`: two most recent iterations have been taken?
-        * `11`: two most recent iterations have been taken?
+        * {{`00`}}: two most recent iterations have not been taken 
+        * {{`01`}}: the most recent iteration was taken, and the one before not taken
+        * {{`10`}}: the most recent iteration was not taken, and the one was
+        * {{`11`}}: two most recent iterations have been taken?
     * In the above model, states {{`00`}} and {{`01`}} predict not taken, while states {{`10`}} and {{`11`}} predict taken.
-    * This fixes the fundamental weakness of the 1‑bit predictor: {{loops}}. A 1‑bit predictor flips direction after {{a single unexpected outcome}}, which means it always mispredicts {{the first and last iteration of a loop}}. A 2‑bit counter, on the other hand, instead requires {{two consecutive mispredictions}} to change its mind.
+    * This avoids the greatest weakness of the 1‑bit predictor: {{loops}}. A 1‑bit predictor flips direction after {{a single unexpected outcome}}, which means it always mispredicts {{the first and last iteration of a loop}}. A 2‑bit counter, on the other hand, instead requires {{two consecutive mispredictions}} to change its mind.
     * In general: a 2-bit counter {{ignores one exception}}, while a 3-bit counter {{ignores more}}.
 * "{{Return Address Stack}}" (RAS): a tiny hardware stack that is updated to track the {{call stack (return addresses only)}}. 
     * Addresses are added to the RAS when there is a {{`call`}} instruction. 
