@@ -20,7 +20,7 @@ async function loadClasses() {
         item.textContent = name;
         item.onclick = () => {
             history.pushState({}, "", `/?class=${encodeURIComponent(name)}`);
-            routeFromURL();
+            LiimnliII();
         };
         main.appendChild(item);
     });
@@ -51,7 +51,7 @@ async function loadNotesets(className) {
         item.textContent = name;
         item.onclick = () => {
             history.pushState({}, "", `/?class=${encodeURIComponent(className)}&noteset=${encodeURIComponent(name)}`);
-            routeFromURL();
+            LiimnliII();
         };
         main.appendChild(item);
     });

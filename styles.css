@@ -239,7 +239,7 @@ li.empty-li::marker {
 .hamburger {
   --size: 43px;
 
-  display: inline-block;
+  display: none;
   height: calc(var(--size) * 0.93);
   position: fixed;
   bottom: 85px;

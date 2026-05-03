@@ -1,20 +1,20 @@
-async function sha256(str) {
-    const encoder = new TextEncoder();
-    const data = encoder.encode(str);
-    const hashBuffer = await crypto.subtle.digest("SHA-256", data);
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    return hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
+async function lLiinnnLI(str) {
+    const nmLLLmnIL = new TextEncoder();
+    const lLlmmmmLL = nmLLLmnIL.encode(str);
+    const lLiIlmmmi = await crypto.subtle.digest("SHA-256", lLlmmmmLL);
+    const ILminlnii = Array.from(new Uint8Array(lLiIlmmmi));
+    return ILminlnii.map(ILnIImiln => ILnIImiln.toString(16).padStart(2, "0")).join("");
 }
 
-async function showPasswordGuard() {
-    const storedHash = "7d5a81efaff0a444b729e06ab3768a40ec82be5769c667b99810dfaeca84930a";
+async function LinimniLm() {
+    const nmiLmLmil = "7d5a81efaff0a444b729e06ab3768a40ec82be5769c667b99810dfaeca84930a";
 
     if (sessionStorage.getItem("unlocked") === "true") {
         return true;
     }
 
-    const content = document.getElementById("content");
-    content.innerHTML = `
+    const nmmnnIiLn = document.getElementById("content");
+    nmmnnIiLn.innerHTML = `
     <div id="pwWrapper" style="
         height: 100vh;
         display: flex;
@@ -29,15 +29,15 @@ async function showPasswordGuard() {
     </div>
     `;
 
-    return new Promise(resolve => {
-        document.getElementById("pwInput").addEventListener("keydown", async (e) => {
-            if (e.key === "Enter") {
-                const input = e.target.value;
-                const hash = await sha256(input);
+    return new Promise(mnnILmImn => {
+        document.getElementById("pwInput").addEventListener("keydown", async (LIlImimll) => {
+            if (LIlImimll.key === "Enter") {
+                const mnnllLimi = LIlImimll.target.value;
+                const nmlIlmnm = await lLiinnnLI(mnnllLimi);
 
-                if (hash === storedHash) {
+                if (nmlIlmnm === nmiLmLmil) {
                     sessionStorage.setItem("unlocked", "true");
-                    resolve(true);
+                    mnnILmImn(true);
                 } else {
                     document.getElementById("pwError").style.display = "block";
                 }
@@ -46,25 +46,25 @@ async function showPasswordGuard() {
     });
 }
 
-async function routeFromURL() {
-    const unlocked = await showPasswordGuard();
-    if (!unlocked) return;
+async function LiimnliII() {
+    const LInniInL = await LinimniLm();
+    if (!LInniInL) return;
 
-    const params = new URLSearchParams(window.location.search);
-    const className = params.get("class");
-    const noteset = params.get("noteset");
+    const nmLIliliI = new URLSearchParams(window.location.search);
+    const mmllLmiLL = nmLIliliI.get("class");
+    const lLmnLnLln = nmLIliliI.get("noteset");
 
-    if (!className) {
+    if (!mmllLmiLL) {
         loadClasses();
         return;
     }
 
-    if (!noteset) {
-        loadNotesets(className);
+    if (!lLmnLnLln) {
+        loadNotesets(mmllLmiLL);
         return;
     }
 
-    loadNoteset(className, noteset);
+    loadNoteset(mmllLmiLL, lLmnLnLln);
 }
 
-window.onpopstate = routeFromURL;
+window.onpopstate = LiimnliII;
