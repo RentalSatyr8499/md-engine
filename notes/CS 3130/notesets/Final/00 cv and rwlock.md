@@ -109,7 +109,7 @@ void Finish(int index) {
         * B. `finished[0] || finished[1]`
         * C. `!finished[0] || !finished[1]`
         * D. `finished[0] != finished[1]`
-    * What should go in blank 2? Answer: {{A}}
+    * What should go in blank 2? Answer: {{D is the best answer, but B will result in correct behavior as well}}
         * A. `pthread_cond_signal(&both_finished_cv)`
         * B. `pthread_cond_broadcast(&both_finished_cv)`
         * C. `if (finished[1-index]) pthread_cond_signal(&both_finished_cv);`
@@ -136,7 +136,7 @@ void BarrierWait(BarrierInfo *b) {
 ```
 * Exercise: Finish the unfinished code above. 
     * Blank 1: {{`pthread_cond_t cv;`}}
-    * Blank 2: {{`pthread_cond_signal(&b->cv);`}}
+    * Blank 2: {{`pthread_cond_broadcast(&b->cv);`}}
     * Blank 3: {{`while(b->number_reached != b->total_threads)`}}
     * Blank 4: {{`pthread_cond_wait(&b->cv, &b->lock);`}}
 

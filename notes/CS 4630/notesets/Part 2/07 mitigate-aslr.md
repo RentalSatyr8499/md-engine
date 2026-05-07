@@ -10,7 +10,7 @@
     * To randomize the location of further segments, the OS repeats the above process with increasingly small ranges to choose a random value from. The default random value remains 0. 
     * ASLR is a probabilistic defense. Attackers can overcome it through brute‑force if entropy is low. This is because in certain scenarios, an attacker can guess over and over without consequence: a wrong guess might not crash the whole application; servers restart automatically; local programs can be run repeatedly. In comparison to 32-bit, the entropy of a 64-bit system is higher.
 
-# go back to slide 11
+* I didn't get to finish this one. I left off at slide 11 in the pdf.
 
 ```c
 struct point {

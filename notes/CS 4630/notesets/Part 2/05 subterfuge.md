@@ -1,8 +1,22 @@
-* "Pointer subterfuge" attack: a class of vulnerabilities that uses {{buffer overflows}} to corrupt a pointer stored {{on the stack}}. This can allow an attacker to overwrite a variety of different things, including...
-    * overwriting existing machine code (but this actually usually doesn't work, because {{code pages are often not writable}}).
-    * overwriting the {{return address}} directly, instead of through a long contiguous overwrite of stack memory. This is especially powerful because {{it skips the canary}}.
-    * overwrite {{function}} pointers or other data pointers.
+* "Pointer subterfuge" attack: a class of vulnerabilities that uses buffer overflows to corrupt a pointer. When the pointer is stored on the stack, this is especially useful for overwriting the return address because {{it skips the canary}}.
+* Besides the stack, there are other situations where writeable buffers accidentally end up next to pointers, and can overwrite them. For example, {{structs or globals}}. Suppose a struct called `Command` is defined as `Command { type; values[MAX]; int *active_value; ... }`. If {{`values` (array)}} comes before {{`active_value` (pointer)}} on the stack, there's an overflow vulnerability.
+* Yet kind of subterfuge attack that's even easier than targeting a return address is targeting the {{Global Offset Table (GOT)}}. 
+    * Does the GOT's layout change with compiler options and stack frames? {{No; this makes it far more stable than the stack}}.
+    * Does attacking the GOT via subterfuge overflow require dealing with the stack canary? {{No; the GOT isn't on the stack}}.
+    * Since the GOT is usually {{writable}}, it is very suspectible to arbitary write attacks.
+* Another kind of subterfuge attack that's available in C++ targets {{virtual methods (which are like C++'s version of a Java `abstract` method)}}.
+    * Each virtual object stores a "{{vtable}}" pointer as its first field, which is just a table of {{function pointers}}.
+    * Vtables themselves are hard to overwrite because {{they are usually in read-only memory}}. But the {{*vtable pointer* inside the object, the one that points to the vtable itself,}} is writable.
+    * Two ways to attack a vtable:
+        1. Build a fake table (usually in the {{buffer}}). Then, overwrite the {{object’s vtable pointer}} to point to the fake table.
+        2. Point the object's vtable pointer to a different {{existing table or offset}}. This causes program to call unintended functions.
+* "Return-to-somewhere" attack: when you overwrite a return address with {{the address of an existing legitimate function}}. 
+    * A good destination is {{`system()`}} because it exists in libc for every dynamically linked program., and can be used to open a shell. The challenge with this approach, though, is that the attack needs to control the {{`rdi`}} register.
+    * We can locate `system()` in `libc` (when ASLR is off) by: (1) finding {{the `libc` base address}} using the `ldd` command, then (2) finding the {{offset of `system` from `libc`}} using `objdump --dynamic-syms ... | grep system`.
 
+
+
+# Exercises
 ```c
 void f2b(void *arg, size_t len) {
     char buffer[100];
@@ -16,8 +30,7 @@ void f2b(void *arg, size_t len) {
     * Suppose that `ptr` points to the return address of `f2b`. If `buffer` were overflowed, how could an attacker construct the input so that when `f2b` returns, it points to malicious shellcode on the stack? Answer: {{Bytes 1-100 consist of the nop sled and shellcode payload. The next 8 bytes will overwrite `val` as the return-to-stack address (so `val` will be overwritten to contain an address somewhere in the middle of the nop sled). The next 8 bytes, which are `ptr`, remain unchanged.}}
         * Hint: lowest to highest addresses, the stack contains {{`buffer` (in increasing indices as addresses increase) (100 bytes), `val` (8 bytes), `ptr` (8 bytes, points to return address), stack canary, return address for `f2b`}}
         * Does this attack involve touching the canary? Answer: {{no}}
-    * How can we prevent this attack? Answer: {{change stack memory layout so that `buffer` can't overflow to other stuff. So push `buffer` on to the stack before `ptr` and `val` so that any overflow hits the stack canary immediately. In this layout, the stack, from lowest addresses to highest addresses, would look like: `val` (8 bytes), `ptr` (8 bytes), `buffer` (100 bytes), stack canary, return address for `f2b`}}
-
+    * What's one simple way we could prevent this attack? Answer: {{change stack memory layout so that `buffer` can't overflow to other stuff. So push `buffer` on to the stack before `ptr` and `val` so that any overflow hits the stack canary immediately. In this layout, the stack, from lowest addresses to highest addresses, would look like: `val` (8 bytes), `ptr` (8 bytes), `buffer` (100 bytes), stack canary, return address for `f2b`}}
 ```c
 void vulnerable() {
     int *array;
@@ -29,81 +42,15 @@ void vulnerable() {
     ...
 }
 ```
-```
-vulnerable:
-    pushq %rbp
-    pushq %rbx
-    subq $136, %rsp
-    movq %fs:40, %rax
-    movq %rax, 120(%rsp)
-    xorl %eax, %eax
-    leaq 104(%rsp), %rdi
-    call Allocate
-    testl %eax, %eax
-    je call_abort
-    movq %rsp, %rdi
-    call gets
-    movq 104(%rsp), %rbp
-    movl $10, %edx
-    movl $0, %esi
-    movq %rsp, %rdi
-    call strtol
-    movl %eax, 0(%rbp)
-    ...
-```
-* Exercise: Suppose a return address is located at `0x12345`, and attacker-written shelldcode is located at `0x5678`. 
-    * If `buffer` were overflowed, how could an attacker construct the input so that the program points to their code? Specify if values should be bytes, hex or decimal.
-        * `0x12345` should be written at {{104 bytes into `buffer`}} in the format of {{bytes}}.
-        * `0x5678` should be written at {{the beginning of `buffer`}} in the format of {{decimal (base 10)}}.
-        * Hint: {{we can make `array[0]` point wherever we want, because array is on the stack and can be overflowed to. Then, we can make whatever we just made `array[0]` point to equal whatever we want, because of the line  `array[0] = atoi(buffer)`}}.
-    * How can we prevent this attack? Answer: {{change stack memory layout so that `buffer` can't overflow to other stuff. So push `buffer` on to the stack before `array` so that any overflow hits the stack canary immediately. In this layout, the stack, from lowest addresses to highest addresses, would look like: `array` (8 bytes), `buffer` (100 bytes), stack canary, return address for `scanf`}}
-
-* Other types of pointer subterfuge attacks: there are other situations where writeable buffers accidentally end up next to pointers, and can overwrite them. For example, {{structs}} or {{globals}}.
-    * Example (structs): Suppose a struct called `Command` is defined as `Command { type; values[MAX]; int *active_value; ... }`. If {{`values` (array)}} comes before {{`active_value` (pointer)}} on the stack, overflow in {{`values`}} can overwrite the pointer.
-```c
-Command *current_command;
-char input_buffer[4096];
-void run_next_command() {
-    if (!current_command) {
-        current_command = getNext();
-    }
-current_command−> ...
-...
-}
-```
-* 
-    * Example (globals): Look at the code block. If {{`input_buffer[4096]`}} comes before {{`current_command`}} on the stack, it can overwrite {{`current_command`}}.
-* Moral of the story: if {{a buffer}} comes before {{sensitive fields (return addresses, pointers)}} in memory, there's often an opportunity for a subterfuge attack.
-
-* Another kind of subterfuge attack that's even easier than targeting a return address is targeting the {{Global Offset Table (GOT)}}. 
-    * The GOT lives in {{a fixed, predictable location in the data segment}}. It's used for {{jumping to external functions}}, meaning the references it contains are often called multiple times thoroughout execution.
-    * Does the GOT's layout change with compiler options and stack frames? {{No; this makes it far more stable than the stack}}.
-    * Does attacking the GOT via subterfuge overflow require dealing with the stack canary? {{No; the GOT isn't on the stack}}.
-* Another kind of subterfuge attack that's available in C++ targets {{virtual methods (which are like C++'s version of a Java `abstract` method)}}.
-    * Each virtual object stores a "{{vtable}}" pointer as its first field, which is just a table of {{function pointers}}.
-    * In practice, what happens when a virtual method called, aka how do "virtual dispatches" work? {{The vtable is loaded, the index is located, and the function pointer located there is called}}.
-    * Vtables themselves are hard to overwrite because {{they are usually in read-only memory}}. But the {{pointer inside the object that points to the vtable}} is writable.
-# skipped 23-29 (implementation specifics of vtables)
-
-* Three ways to attack using an arbitrary write:
-    1. Overwrite directly. This works for {{GOT (writable)}}, not for {{vtables (read-only)}}.
-    2. Build a fake table (usually in the {{buffer}}). Then, overwrite the {{object’s vtable pointer}} to point to the fake table.
-    3. Point the object's vtable pointer to a different {{existing table or offset}}. This causes program to {{call unintended functions}}.
-
-![alt text](image5.png){size=small}
-* Exercise: Suppose `gets(objs[0].buffer)` is run and eventually `ptr->foo()` will be run, where `ptr == &objs[1]`. If an attacker wanted to take control of the program, how would they build the input? Hint: {{Build a fake vtable at the beginning of the buffer, point to it, and have the fake vtable point to shellcode}}
+* Exercise: Consider the code above. Suppose a return address is located at `0x12345`, and attacker-written shelldcode is located at `0x5678`. Also suppose that there is four bytes of between `buffer` and `array` on the stack. If `buffer` were overflowed, how could an attacker construct the input so that the program points to their code? Specify if values should be bytes, hex or decimal.
+    * `0x12345` should be written at {{104 bytes into `buffer`}} in the format of {{bytes}}.
+    * `0x5678` should be written at {{the beginning of `buffer`}} in the format of {{decimal (base 10)}}.
+    * Hint: {{we can make `array[0]` point wherever we want, because array is on the stack and can be overflowed to. Then, we can make whatever we just made `array[0]` point to equal whatever we want, because of the line  `array[0] = atoi(buffer)`}}.
+![alt text](image5.png){size=medium}
+* Exercise: Consider the code and struct layout above. Suppose `gets(objs[0].buffer)` is run and eventually `ptr->foo()` will be run, where `ptr == &objs[1]`. Also suppose an attacker who wants to take control of the program placed shellcode halfway through `buffer`. How could they build an input to `buffer` to redirect the program to their code? Hint: {{Build a fake vtable at the beginning of the buffer, point to it, and have the fake vtable point to shellcode}}
     * Input start: {{address of `objs[0].buffer[50]` (pointer from "fake vtable" to the shellcode)}}
     * Input + 50 bytes: {{shellcode}}
     * Input + 100 bytes: {{address of `objs[0].buffer[0]` (pointer to fake vtable)}}
-
-* "Return-to-somewhere" attack: when you overwrite a return address with {{the address of an existing legitimate function}}. 
-    * A good destination is {{`system()`}} because it exists in libc for every dynamically linked program., and can be used to open a shell.
-    * The challenge with `system()`, though, is that the attack needs to control the {{`rdi`}} register.
-    * We can locate `system()` in `libc` (when ASLR is off) by: (1) finding {{the `libc` base address}} using the `ldd` command, then (2) finding the {{offset of `system` from `libc`}} using `objdump --dynamic-syms ... | grep system`.
-* "Write-to-write" case study: in Network Time Protocol Daemon, there was a real bug in the line, `memmove((char*)datapt, dp, dlen);`. Because `datapt` was a global pointer, overwriting `datapt` gives arbitrary write via {{`memmove`}}.
-    * An attacker could use this arbitrary write to overwrite the {{GOT entry for `strlen`}} with {{the address of `system()`}}. Now, the next time the process thinks it's calling `strlen(user_input)`, it's actually calling `system(user_input)`.
-    * In reality, the exploit was more complex, needing to bypass mitigations such as {{figuring out how to input null bytes}}.
-
 ```c
 struct A {
     char name[100];
