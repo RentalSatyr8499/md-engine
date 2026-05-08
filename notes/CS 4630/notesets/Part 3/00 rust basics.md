@@ -1,11 +1,10 @@
 * With programming languages, there is always a tension between safety and performance. Fill out the table below. 
 | language | upside(s) | drawback |
 |----------|--------|----------|
-|C/C++| l{{ets you get close to the machine and write high-performance software}} | {{horrible for security}} |
+|C/C++| {{lets you get close to the machine and write high-performance software}} | {{horrible for security}} |
 |"safe languages" (Python)|{{much more secure}}| {{can't optimize performance/get close to the machine, due to garbage collection overhead, array checking overhead, etc.}}|
 |Java|considered secure, and provides a class called `com.sun.Unsafe` that allows for {{low-level memory manipulation}}|{{Java `Unsafe` is hard to integrate with normal Java objects, easy to create dangling pointers with, etc.}}|
-* Rust strikes the middle ground between C/C++ and safe languages. It enforces no dangling pointers, no out‑of‑bounds access, and no data races. But it also provides unsafe { ... } blocks, raw pointers, and low‑level libraries.
-
+* Rust is super awesome sauce because it strikes the middle ground between C/C++ and safe languages. It enforces no dangling pointers, no out‑of‑bounds access, and no data races. But it also provides unsafe { ... } blocks, raw pointers, and low‑level libraries.
 * Simple Rust syntax
     * Declare a function with the {{`fn`}} keyword
     * Print "Hello, {name}!" where `name` is a variable: {{`println!("Hello, {}!", name);`}}

@@ -40,25 +40,4 @@
         * Start a `/bin/sh` process with its own mount namespace: {{`unshare −−mount /bin/sh`}}
         * Modify the mount table using bind mounts to bind `/bin` to `/tmp/workdir/bin`: {{`mount −o bind,ro /bin /tmp/workdir/bin`}}
     * Suppose you want to sandbox a process. After creating the mount namespace, don't forget to {{use `chroot` to change the process's root to the new file system}}.
-
 * In {{ambient}} authority, a program has coarse-grained user-like permissions. On the other hand, in capability systems, a program only has access to resources or names explicitly handed to it, such as {{open files}}. Fill out the table on privilege separation strategies below. 
-
-| strategy name | use case | how does the mechanism work? | pros | cons | is it ambient authority or capability-based?|
-|-------|-------|-------|-------|-------|-------|
-| switching users | run dangerous code | switch the user ID | {{easy to implement because it uses existing OS permissions}} | {{too coarse‑grained; low‑privilege user can still read many files, open sockets, etc.}} | {{ambient}} |
-| just calling `prctl(SECCOMP_SET_MODE_STRICT)` in C | sandbox extremely {{simple}} programs that only need {{read/write on existing fds}} | {{system call filtering}} | {{extremely simple and safe}} | {{so restrictive that it breaks almost all real programs}} | {{ambient}} |
-| Berkeley Packet Filtering | {{extremely fine‑grained syscall sandboxing}} | {{BPF programs attach to existing programs, implementing filters that inspects syscall numbers and arguments}} | {{very fine‑grained; good performance}} | {{hard to inspect pointer args; many syscalls to cover}} | {{ambient}} |
-| using `chroot` alone | N/A | {{changes a process’s root directory so it can only see a subtree}} | simple | (1) r{{oot can escape}}; (2) {{open fds bypass it}}; (3) {{requires duplicated system files}} | {{capability}} |
-| Linux mount namespaces + `chroot` | need to isolate a filesystem  | give process its own {{mount}} table, populate it using {{bind mounts}}, then {{`chroot`}} into it | strong filesystem isolation; no need to {{copy system files}} | only isolates the filesystem. you must combine with {{user namespaces}}{{}} to avoid privilege escalation | {{capability}} |
-| Linux user namespaces | {{allow unprivileged users to create isolated environments that *appear* to have root}} | remap UIDs so process appears as {{root}} inside the namespace but is actually {{unprivileged}} outside | necessary for container‑like isolation | not covered | {{ambient}} |
-| SELinux | enforce system‑wide policies restricting what processes can access | {{"mandatory access controls" (MAC): kernel checks every access against a policy}} | very strong and fine‑grained | can break applications | N/A |
-
-# Exercises
-* What scenarios does chroot make most/least sense for? Answer: {{}}
-    * A. the rendering part of web browser
-    * B. a web server
-    * C. a media player
-    * D. a network time server (for other machines to set their clocks)
-
-# questions - is table right
-# exercise answer
