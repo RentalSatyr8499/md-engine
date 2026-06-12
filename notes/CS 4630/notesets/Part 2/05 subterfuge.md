@@ -47,7 +47,7 @@ void vulnerable() {
     * `0x5678` should be written at {{the beginning of `buffer`}} in the format of {{decimal (base 10)}}.
     * Hint: {{we can make `array[0]` point wherever we want, because array is on the stack and can be overflowed to. Then, we can make whatever we just made `array[0]` point to equal whatever we want, because of the line  `array[0] = atoi(buffer)`}}.
 ![alt text](image5.png){size=medium}
-* Exercise: Consider the code and struct layout above. Suppose `gets(objs[0].buffer)` is run and eventually `ptr->foo()` will be run, where `ptr == &objs[1]`. Also suppose an attacker who wants to take control of the program placed shellcode halfway through `buffer`. How could they build an input to `buffer` to redirect the program to their code? Hint: {{Build a fake vtable at the beginning of the buffer, point to it, and have the fake vtable point to shellcode}}
+* Exercise: Consider the code and struct layout above. Suppose `gets(objs[0].buffer)` is run and eventually `ptr->foo()` will be run, where `ptr == &objs[1]`. Also suppose an attacker who wants to take control of the program placed shellcode halfway through `buffer`. How could they build an input to ``buffer`` to redirect the program to their code? Hint: {{Build a fake vtable at the beginning of the buffer, point to it, and have the fake vtable point to shellcode}}
     * Input start: {{address of `objs[0].buffer[50]` (pointer from "fake vtable" to the shellcode)}}
     * Input + 50 bytes: {{shellcode}}
     * Input + 100 bytes: {{address of `objs[0].buffer[0]` (pointer to fake vtable)}}
