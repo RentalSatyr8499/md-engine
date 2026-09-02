@@ -1,0 +1,6 @@
+* Why is clocking important when trasmitting signals over a wire? What's a common solution? Answer: {{Senders and recievers of messages need to stay chronologically in sync, otherwise there is no way to distinguish between two of the same signal and one long signal. One solution is to periodically enforce and check for transitions from low to high signal to ensure that the signal hasn't been frozen.}}
+* What is the problem of framing? What's a common solution? Answer: {{When a bunch of 1s and 0s are sent consecutively, it's hard to know where the encoding for one character ends and the other begins. One solution is to use extra symbols to indicate beginning of message.}}
+    * "Bit stuffing": {{using an agreed-upon sequence of bits to indicate the start and end of a message}}.
+* Is there a benefit to failure-checking in earlier layers of the network model? Answer: {{Yes, there's an immense optimization because you can stop sending a message you already know is corrupt at a much earlier layer, avoiding the need for overhead from extra layers just to a bad message.}}
+* "Checksum" functions are a highly effective way to identify corrupted messages and work by {{checking the correctness of a message using its hash}}. They are often used at the {{data link}} layer and above.
+* What's error checking code i zoned out
