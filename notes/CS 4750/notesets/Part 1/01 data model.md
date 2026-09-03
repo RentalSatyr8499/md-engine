@@ -28,8 +28,28 @@
         * {{Hierarchical}} model: data arranged in a tree with parent–child relationships.
         * {{Network}} model: data arranged as a flexible graph of interconnected records.
 * Zooming into the relational model: 
-    * A "relation": {{a set (no duplicates) of unordered tuples}}.
-    * A "table": {{a list (duplicates allowed) of ordered rows}}.
- 
-# left off on 15 for 4750meet03-data-model
+    * A "relation": {{a set (no duplicates) of unordered tuples}}. 
+        * An n-ary relation is a table that {{has n columns}}.
+        * By definition, tuple values are atomic, meaning {{there are no lists or nested structures}}. 
+        * (T/F) The special value NULL is allowed in every place in the tuple (is a member of every domain). {{T}}
+    * A "table": {{a list (duplicates allowed) of ordered rows}}. While the relational model obeys the theoretical rules of a "relation", they are often implemented using "tables", meaning additional work needs to be done to ensure that data is organized in a way that is still valid under the relational model paradigm.
+    * "{{Keys}}" are used to uniquely identify tuples.
+        * {{Super}} key: Any set of attributes that uniquely identifies tuples.
+        * {{Candidate}} key: A minimal super key; no unnecessary attributes.
+        * {{Primary}} key: The chosen candidate key used by the DBMS. This is typically the candidate key with the most important semantic meaning. 
+            * Primary keys must disallow {{NULL}} values. 
+            * Some DBMSs auto-generate primary keys for internal use.
+        * {{Foreign}} key: an "attribute that uniquely identify a row in another table".
 
+## Exercises
+![alt text](image1.png)
+* Answer the following based on the above image:
+    * Write the schema statement for the relation in the image above: {{`Movies(title: STRING, year: INTEGER, length: INTEGER, genre: STRING)`}}
+    * What's the selected tuple? {{`("Star wars", 1977, 124, "sciFi")`}}
+    * What's the selected instance? {{`{("Star wars", 1977, 124, "sciFi"),("Wayne's world", 1992, 95, "comedy")}`}}
+    * Suppose we stipulate the assumption that all movies can be uniquely identified by their name and their year (no two movies with the same name will be made in the same year). Write the key of the relation. {{`PRIMARY KEY (title, year)`}}
+![alt text](image2.png)
+* For the image above, list all of the...
+    * Super keys: {{`{computingID}, {SSN}, {computingID, SSN}, {computingID, name}, {SSN, name}, {computingID, SSN, name}`}}
+    * Candidate keys: {{`{computingID}, {SSN}`}}
+    * The likely best primary key: {{`{computingID}`}}
