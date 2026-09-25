@@ -1,8 +1,10 @@
+// views.js
 
 async function loadClasses() {
     document.title = config.siteTitle;
 
-    const classDirs = await fetchDirectoryListing("notes/");
+    // Fetches top-level keys from manifest.json
+    const classDirs = await fetchClasses();
     const container = document.getElementById("content");
 
     container.innerHTML = `
@@ -14,7 +16,6 @@ async function loadClasses() {
     const main = document.getElementById("main-container");
 
     classDirs.forEach(name => {
-        name = name.replace(/\/$/, "");
         const item = document.createElement("div");
         item.className = "noteset-item";
         item.textContent = name;
@@ -27,13 +28,13 @@ async function loadClasses() {
 
     document.getElementById("reveal-toggle").style.display = "none";
     document.getElementById("hamburger").style.display = "none";
-
 }
 
 async function loadNotesets(className) {
     document.title = className;
 
-    const notesetDirs = await fetchDirectoryListing(`notes/${className}/notesets/`);
+    // Fetches noteset keys for the specific class from manifest.json
+    const notesetDirs = await fetchNotesets(className);
     const container = document.getElementById("content");
 
     container.innerHTML = `
@@ -45,7 +46,6 @@ async function loadNotesets(className) {
     const main = document.getElementById("main-container");
 
     notesetDirs.forEach(name => {
-        name = name.replace(/\/$/, "");
         const item = document.createElement("div");
         item.className = "noteset-item";
         item.textContent = name;
@@ -67,10 +67,12 @@ async function loadNoteset(className, notesetName) {
     const container = renderNotesetShell(className, notesetName, description);
 
     const files = await loadMarkdownFiles(className, notesetName);
-    document.getElementById("loading-message").remove();
+    const loadingMsg = document.getElementById("loading-message");
+    if (loadingMsg) loadingMsg.remove();
 
     for (const { file, md } of files) {
-        const noteTitle = file.slice(3).replace(".md", "");
+        // Strip leading sequence numbers (e.g., "00 ") and trailing ".md"
+        const noteTitle = file.replace(/^\d+\s*/, "").replace(/\.md$/i, "");
 
         const header = document.createElement("h2");
         header.textContent = noteTitle;
@@ -84,7 +86,8 @@ async function loadNoteset(className, notesetName) {
         container.appendChild(header);
         container.appendChild(content);
 
-        content.innerHTML = transformMarkdown(marked.parse(preprocess(md)), className);
+        // Pass notesetName along so image paths inside markdown resolve properly
+        content.innerHTML = transformMarkdown(marked.parse(preprocess(md)), className, notesetName);
         content.querySelectorAll("pre code").forEach(block => hljs.highlightElement(block));
     }
 

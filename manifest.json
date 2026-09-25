@@ -1,0 +1,112 @@
+{
+  "CS 3130": {
+    "Final": {
+      "description": "The final will probably be cumulative, so make sure to review Midterm 1 and Midterm 2 stuff too.\n\n\n",
+      "files": [
+        "00 cv and rwlock.md",
+        "01 network.md",
+        "02 secure.md",
+        "03 pipeline.md",
+        "04 ooo.md",
+        "05 branch prediction.md",
+        "06 spectre.md"
+      ]
+    },
+    "Midterm 1": {
+      "description": "hey guys this is a study guide for Sp26 Reiss + Campbell exam. lots of content taken from slides. if you see an error or something to add email me xaq7pj@virginia.edu",
+      "files": [
+        "00 intro.md",
+        "02 building.md",
+        "03 permissions.md",
+        "04 kernel.md",
+        "05 fork, waitpid, exec.md",
+        "06 virtual memory basics.md",
+        "07 page tables.md"
+      ]
+    },
+    "Midterm 2": {
+      "description": "hey guys this is a study guide for Sp26 Reiss + Campbell exam. lots of content taken from slides. if you see an error or something to add email me xaq7pj@virginia.edu\n\n\n",
+      "files": [
+        "00 caching basics.md",
+        "01 cache and associativity.md",
+        "02 cache writing and TLBs.md",
+        "04 threads.md",
+        "05 sync: reorder, locks, barriers.md",
+        "06 deadlock.md"
+      ]
+    }
+  },
+  "CS 4457": {
+    "Part 1": {
+      "description": "",
+      "files": [
+        "00 intro.md",
+        "01 physical and link.md",
+        "02 reliable-stop.md",
+        "03 perf.md",
+        "04 reliable-window.md",
+        "05 tcp.md",
+        "06 switches.md",
+        "07 arp.md",
+        "08 congestion.md",
+        "09 sim.md"
+      ]
+    }
+  },
+  "CS 4630": {
+    "Part 1": {
+      "description": "",
+      "files": [
+        "01 intro.md",
+        "02 asm.md",
+        "03 executables.md",
+        "04 reverse engineering.md",
+        "05 x86 encoding.md",
+        "06 virus.md",
+        "07 heuristic detection.md",
+        "08 anti-anti viruses.md"
+      ]
+    },
+    "Part 2": {
+      "description": "",
+      "files": [
+        "01 taint.md",
+        "02 overflow.md",
+        "03 stack smashing.md",
+        "04 stack protection.md",
+        "05 subterfuge.md",
+        "06 memory protection.md",
+        "07 aslr.md",
+        "08 rop.md",
+        "09 uaf.md"
+      ]
+    },
+    "Part 3": {
+      "description": "",
+      "files": [
+        "00 rust basics.md",
+        "01 smart rust.md",
+        "02 other overflows.md",
+        "03 testing.md",
+        "04 symbolic.md",
+        "05 privilege separation.md",
+        "06 sandboxing.md",
+        "07 static.md",
+        "08 bounds.md",
+        "09 cfi.md"
+      ]
+    }
+  },
+  "CS 4750": {
+    "Part 1": {
+      "description": "",
+      "files": [
+        "00 intro.md",
+        "01 data model.md",
+        "02 ER model, weak entities, subclass.md",
+        "03 functional dependency, normalization.md",
+        "04 sql.md"
+      ]
+    }
+  }
+}

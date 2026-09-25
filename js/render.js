@@ -54,7 +54,8 @@ function transformMarkdown(html, className) {
         (match, before, src, after, size) => {
             if (!/^https?:\/\//i.test(src)) {
                 const filename = src.split("/").pop().replace(/^\.\//, "");
-                src = `notes/${encodeURIComponent(className)}/assets/${filename}`;
+                // Resolves relative to notes/<Class>/notesets/<Noteset>/
+                src = `notes/${encodeURIComponent(className)}/notesets/${encodeURIComponent(notesetName)}/${encodeURIComponent(filename)}`;
             }
             return `<img class="img-size-${size}" ${before}src="${src}"${after}>`;
         }

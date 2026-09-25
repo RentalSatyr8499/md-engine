@@ -4,6 +4,8 @@
   },
   "type": "module",
   "scripts": {
+    "build": "node build-manifest.js",
+    "prebuild": "node build-manifest.js",
     "start": "node js/server.js"
   },
   "devDependencies": {

@@ -18,12 +18,16 @@
 ![alt text](image6.png){size=medium}
 * 
     * Sender logic: 
-        * If you recieve an ACK X such that X is greater than {{the Last ACK Recieved (LAR)}} but less than {{the Last Frame Sent (LFS)}}, increment the LAR to X, and clear any timers that {{will resend frames less than X}}.
-    * https://www.cs.virginia.edu/~cr4bd/4457/F2026/slides/reliable-window.pdf summarize slides 35 and 41 in prose
+        * If you recieve an ACK X such that {{LAR}} < X ≤ {{LFS}}, increment the LAR to X, and clear any timers that {{will resend frames less than X}}.
+        * If the number of frames currently in flight, LFS - {{LAR}}, does not yet reach the SWS, we can send {{LFS + 1}}. Then we would set a timer to {{resend LFS + 1}}. 
+    * Reciever logic: 
+        * The LAF, "last acceptable frame", represents {{the highest frame number that we'll accept and buffer without discarding it}}. It is calculated by {{LFR + RWS}}.
+        * If you recieve a packet X such that {{LFR}} < X ≤ {{LAR}}, increment LFR to {{(first missing frame after LFR) - 1}}. Then increment LAF to {{LFR + RWS}}.
     * "Bandwidth-delay product": represents the ideal {{sliding window size}}, and is calculated by {{multiplying the RTT with the transmission speed}}.
-        * If we were to choose a sliding window size *greater than* our bandwidth delay product, frames would start accumulating on queues that are full, weighing down the throughput.
-        * slide 55??
-* It is possible to have sequence numbers that wraparound. 
+        * If we were to choose a sliding window size *greater than* our bandwidth delay product, then {{frames would start accumulating on queues that are full, causing frame drops and retransmission}}.
+        * If we were to choose a sliding window size *less than* our bandwidth delay product, then {{the hardware is not being used to its full capacity, which is suboptimal}}.
+        * Even if we choose a sliding window size equal to the bandwidth-delay product, we still need to do one more thing to minimize frame drops and retransmissions: prevent {{bursts}}, which is when the sender temporarily transmits faster than the link can drain packets from the queue. This is typically done through {{pacing}}.
+* It is possible to have sequence numbers that wrap around, but if done incorrectly, this design can be suspectible to confusing which packet is associated with which sequence number cycle, due to {{network reordering}}. This can be mitigated with {{timestamps}}.
 
 ## Exercises
 * Suppose on a sender, the LAR is 10, LFS is 15, and SWS is 5. Fill out the table below. 
@@ -45,5 +49,5 @@
     * *"C. wait until we get an ACK for 6 or 7 or 8 to send it"*
     * *"D. decline to accept the data because we will never be able to send it"*
     * *"E. something else"*
-![alt text](image7.png)
+![alt text](image7.png){size=medium}
 * Consider the image above. If the minimum latency is 1 time unit, and things remain in the queue while sending, the maximum latency is {{1.9 time units}}.
