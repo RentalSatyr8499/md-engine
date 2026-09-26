@@ -20,7 +20,12 @@ async function loadClasses() {
         item.className = "noteset-item";
         item.textContent = name;
         item.onclick = () => {
-            history.pushState({}, "", `/?class=${encodeURIComponent(name)}`);
+            // Relative pushState: no leading "/", so this preserves whatever
+            // subpath the site is actually served under (e.g. GitHub Pages
+            // project sites at /<repo>/). An absolute "/?class=..." here
+            // would silently rewrite the URL to the domain root, breaking
+            // every subsequent relative fetch (./notes/..., ./assets/...).
+            history.pushState({}, "", `?class=${encodeURIComponent(name)}`);
             routeFromURL();
         };
         main.appendChild(item);
@@ -50,7 +55,8 @@ async function loadNotesets(className) {
         item.className = "noteset-item";
         item.textContent = name;
         item.onclick = () => {
-            history.pushState({}, "", `/?class=${encodeURIComponent(className)}&noteset=${encodeURIComponent(name)}`);
+            // Same fix: relative, no leading "/".
+            history.pushState({}, "", `?class=${encodeURIComponent(className)}&noteset=${encodeURIComponent(name)}`);
             routeFromURL();
         };
         main.appendChild(item);
@@ -72,38 +78,38 @@ async function loadNoteset(className, notesetName) {
 
     console.log(`[Rendering Noteset] Total files fetched: ${files.length}`);
 
-for (const { file, md } of files) {
-    console.log(`[Processing File] ${file}`);
+    for (const { file, md } of files) {
+        console.log(`[Processing File] ${file}`);
 
-    if (!md || md.trim() === "") {
-        console.warn(`[Warning] ${file} is empty or failed to load.`);
-        continue;
+        if (!md || md.trim() === "") {
+            console.warn(`[Warning] ${file} is empty or failed to load.`);
+            continue;
+        }
+
+        const noteTitle = file.replace(/^\d+\s*/, "").replace(/\.md$/i, "");
+
+        const header = document.createElement("h2");
+        header.textContent = noteTitle;
+        header.className = "collapsible-header";
+        header.title = "click to toggle collapse";
+
+        const content = document.createElement("div");
+        content.className = "note-content collapsible-content";
+
+        applyCollapsibleBehavior(header, content);
+        container.appendChild(header);
+        container.appendChild(content);
+
+        try {
+            const rawHTML = marked.parse(preprocess(md));
+            const transformedHTML = transformMarkdown(rawHTML, className, notesetName);
+            content.innerHTML = transformedHTML;
+        } catch (parseError) {
+            console.error(`[Parse Error] ${file} failed during marked/transform:`, parseError);
+        }
+
+        content.querySelectorAll("pre code").forEach(block => hljs.highlightElement(block));
     }
-
-    const noteTitle = file.replace(/^\d+\s*/, "").replace(/\.md$/i, "");
-    
-    const header = document.createElement("h2");
-    header.textContent = noteTitle;
-    header.className = "collapsible-header";
-    header.title = "click to toggle collapse";
-
-    const content = document.createElement("div");
-    content.className = "note-content collapsible-content";
-
-    applyCollapsibleBehavior(header, content);
-    container.appendChild(header);
-    container.appendChild(content);
-
-    try {
-        const rawHTML = marked.parse(preprocess(md));
-        const transformedHTML = transformMarkdown(rawHTML, className, notesetName);
-        content.innerHTML = transformedHTML;
-    } catch (parseError) {
-        console.error(`[Parse Error] ${file} failed during marked/transform:`, parseError);
-    }
-
-    content.querySelectorAll("pre code").forEach(block => hljs.highlightElement(block));
-}
 
     document.getElementById("reveal-toggle").style.display = "flex";
     document.getElementById("hamburger").style.display = "flex";
