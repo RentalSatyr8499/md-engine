@@ -1,14 +1,17 @@
+// render.js
 function renderNotesetShell(className, notesetName, description) {
     const container = document.getElementById("content");
 
     container.innerHTML = `
         <div class="noteset-header">
+            <!-- Ensure src uses relative path ./ -->
             <img src="./assets/back.png" class="back-button" alt="Back" title="view all notesets">
             <h1>${notesetName}</h1>
         </div>
         <div id="noteset-description">${description ?? ""}</div>
         <p id="loading-message">Loading notes…</p>
     `;
+    
 
     document.querySelector(".back-button").onclick = () => {
         history.pushState({}, "", `/?class=${encodeURIComponent(className)}`);

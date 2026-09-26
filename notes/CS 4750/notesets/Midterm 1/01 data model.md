@@ -15,7 +15,7 @@
     * Physical data independence: {{"changes to internal model or physical do not impact logical model"}}
     * Logical data independence: {{"changes to logical model do not impact external models"}}
 * "A {{data model}} is a collection of concepts or notations for describing the data in a database". It has three components: {{structure}}, {{integrity}}, and {{manipulation}}.
-    * To refer to the "{{structure}}" of a data model is to talk about the shape of the data: what kinds of records exist, what attributes they have, and how they relate.
+    * To refer to the "{{structure}}" of a data model is to talk about the shape of the data (what kinds of records exist, what attributes they have, and how they relate).
     * The "{{integrity}}" of a data model refers to the rules that data must obey to be counted as valid. Things like "appointment times can’t overlap" or "stock can’t go negative". 
     * The "{{manipulation}}" of a data model dictates what operations you’re allowed to perform on the data.
     * Common kinds of data models: 
@@ -32,7 +32,7 @@
         * An n-ary relation is a table that {{has n columns}}.
         * By definition, tuple values are atomic, meaning {{there are no lists or nested structures}}. 
         * (T/F) The special value NULL is allowed in every place in the tuple (is a member of every domain). {{T}}
-    * A "table": {{a list (duplicates allowed) of ordered rows}}. While the relational model obeys the theoretical rules of a "relation", they are often implemented using "tables", meaning additional work needs to be done to ensure that data is organized in a way that is still valid under the relational model paradigm.
+    * A "table": {{a list (duplicates allowed) of ordered rows}}. While a relational database theoretically obeys the definition of a "relation", they are often implemented using "tables", meaning additional work needs to be done to ensure that data is organized in a way that is still valid under the relational model paradigm.
     * "{{Keys}}" are used to uniquely identify tuples.
         * {{Super}} key: Any set of attributes that uniquely identifies tuples.
         * {{Candidate}} key: A minimal super key; no unnecessary attributes.

@@ -98,13 +98,18 @@
     }
   },
   "CS 4750": {
-    "Part 1": {
+    "Midterm 1": {
       "description": "",
       "files": [
         "00 intro.md",
         "01 data model.md",
         "02 ER model, weak entities, subclass.md",
-        "03 functional dependency, normalization.md",
+        "03 functional dependency, normalization.md"
+      ]
+    },
+    "Midterm 2": {
+      "description": "",
+      "files": [
         "04 sql.md"
       ]
     }
