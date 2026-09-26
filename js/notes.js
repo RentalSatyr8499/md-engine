@@ -56,7 +56,6 @@ async function loadMarkdownFiles(className, notesetName) {
                     console.error(`[Fetch Failed] ${filePath} HTTP ${res.status}`);
                 }
                 const md = await res.text();
-                console.log(`[Loaded MD] ${file} (${md.length} bytes)`);
                 return { file, md };
             } catch (err) {
                 console.error(`[Fetch Error] Failed loading ${file}:`, err);

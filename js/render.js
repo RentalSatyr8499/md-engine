@@ -1,4 +1,5 @@
 // render.js
+
 function renderNotesetShell(className, notesetName, description) {
     const container = document.getElementById("content");
 
@@ -11,10 +12,10 @@ function renderNotesetShell(className, notesetName, description) {
         <div id="noteset-description">${description ?? ""}</div>
         <p id="loading-message">Loading notes…</p>
     `;
-    
 
     document.querySelector(".back-button").onclick = () => {
-        history.pushState({}, "", `/?class=${encodeURIComponent(className)}`);
+        // Use relative path ?class= instead of /?class= to preserve GitHub Pages subpaths
+        history.pushState({}, "", `?class=${encodeURIComponent(className)}`);
         loadNotesets(className);
     };
 
@@ -25,9 +26,7 @@ function preprocess(md) {
     return md.replace(/^(\s*)\* \s*$/gm, "$1* \u200B");
 }
 
-// render.js
-
-function transformMarkdown(html, className, notesetName) { // <-- Added notesetName here
+function transformMarkdown(html, className, notesetName) {
     // 1. Replace {{answer}} with blanks
     html = html.replace(/\{\{(.*?)\}\}/g, (_, p1) =>
         `<span class="blank" onclick="this.classList.toggle('show')">${p1}</span>`
@@ -51,16 +50,18 @@ function transformMarkdown(html, className, notesetName) { // <-- Added notesetN
         }
     );
 
-    // 4. Rewrite image paths + detect size parameter
+    // 4. Rewrite image paths + detect optional size parameter {size=small|medium|large}
+    // Updated regex to catch both standard images and images with size parameters
     html = html.replace(
-        /<img([^>]+)src="([^"]+)"([^>]*)>\s*\{size=(small|medium|large)\}/g,
+        /<img([^>]+)src="([^"]+)"([^>]*)>(?:\s*\{size=(small|medium|large)\})?/g,
         (match, before, src, after, size) => {
             if (!/^https?:\/\//i.test(src)) {
                 const filename = src.split("/").pop().replace(/^\.\//, "");
-                // Resolves image paths relative to notes/<Class>/notesets/<Noteset>/
-                src = `notes/${encodeURIComponent(className)}/notesets/${encodeURIComponent(notesetName)}/${encodeURIComponent(filename)}`;
+                // Resolves image paths relative to ./notes/<Class>/notesets/<Noteset>/
+                src = `./notes/${encodeURIComponent(className)}/notesets/${encodeURIComponent(notesetName)}/${encodeURIComponent(filename)}`;
             }
-            return `<img class="img-size-${size}" ${before}src="${src}"${after}>`;
+            const sizeClass = size ? ` img-size-${size}` : '';
+            return `<img class="${sizeClass}" ${before}src="${src}"${after}>`;
         }
     );
 
@@ -79,7 +80,7 @@ function transformMarkdown(html, className, notesetName) { // <-- Added notesetN
         `</table></div>`
     );
     
-    // 7. Left-align cells marked with <!left>
+    // 7. Left-align cells marked with %%left%%
     html = html.replace(
         /<(td|th)>%%left%%\s*/g,
         `<$1 style="text-align: left;">`
@@ -126,7 +127,7 @@ function uncollapsAll() {
 }
 
 function toggleNav(event) {
-    event.preventDefault();
+    if (event) event.preventDefault();
     if (getPageState() === "uncollapsed") {
         collapseAll();
     } else {
@@ -134,7 +135,6 @@ function toggleNav(event) {
     }
     updateHamburger();
 }
-
 
 function applyCollapsibleBehavior(header, content) {
     header.onclick = () => {
@@ -148,23 +148,28 @@ function applyCollapsibleBehavior(header, content) {
             requestAnimationFrame(() => { content.style.height = "0px"; });
         }
 
-        updateHamburger(); // <-- add this line
+        updateHamburger();
     };
 }
 
 function setupRevealToggle() {
+    const toggleBtn = document.getElementById("reveal-toggle");
+    if (!toggleBtn) return;
+
     const icon = document.getElementById("revealIcon");
     let revealed = false;
 
-    document.getElementById("reveal-toggle").onclick = () => {
+    toggleBtn.onclick = () => {
         revealed = !revealed;
 
         document.querySelectorAll(".blank").forEach(el => {
             el.classList.toggle("show", revealed);
         });
 
-        icon.src = revealed
-            ? "./assets/eye-closed.png"
-            : "./assets/eye-open.png";
+        if (icon) {
+            icon.src = revealed
+                ? "./assets/eye-closed.png"
+                : "./assets/eye-open.png";
+        }
     };
 }

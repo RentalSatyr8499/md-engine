@@ -68,3 +68,5 @@ async function routeFromURL() {
 }
 
 window.onpopstate = routeFromURL;
+// Run router on initial page load
+window.addEventListener("DOMContentLoaded", routeFromURL);

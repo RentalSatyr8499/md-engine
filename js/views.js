@@ -98,8 +98,6 @@ for (const { file, md } of files) {
         const rawHTML = marked.parse(preprocess(md));
         const transformedHTML = transformMarkdown(rawHTML, className, notesetName);
         content.innerHTML = transformedHTML;
-        
-        console.log(`[Success] Rendered ${file}`);
     } catch (parseError) {
         console.error(`[Parse Error] ${file} failed during marked/transform:`, parseError);
     }
