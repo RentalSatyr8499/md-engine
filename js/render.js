@@ -22,7 +22,9 @@ function preprocess(md) {
     return md.replace(/^(\s*)\* \s*$/gm, "$1* \u200B");
 }
 
-function transformMarkdown(html, className) {
+// render.js
+
+function transformMarkdown(html, className, notesetName) { // <-- Added notesetName here
     // 1. Replace {{answer}} with blanks
     html = html.replace(/\{\{(.*?)\}\}/g, (_, p1) =>
         `<span class="blank" onclick="this.classList.toggle('show')">${p1}</span>`
@@ -30,9 +32,7 @@ function transformMarkdown(html, className) {
 
     // 2. Handle math blocks: $...$
     html = html.replace(/\$(.+?)\$/g, (_, expr) => {
-        // superscript: x^{y}
         expr = expr.replace(/(\S)\^\{([^}]+)\}/g, (m, base, sup) => `${base}<sup>${sup}</sup>`);
-        // subscript: x_{y}
         expr = expr.replace(/(\S)_\{([^}]+)\}/g, (m, base, sub) => `${base}<sub>${sub}</sub>`);
         return `<span class="math">${expr}</span>`;
     });
@@ -54,7 +54,7 @@ function transformMarkdown(html, className) {
         (match, before, src, after, size) => {
             if (!/^https?:\/\//i.test(src)) {
                 const filename = src.split("/").pop().replace(/^\.\//, "");
-                // Resolves relative to notes/<Class>/notesets/<Noteset>/
+                // Resolves image paths relative to notes/<Class>/notesets/<Noteset>/
                 src = `notes/${encodeURIComponent(className)}/notesets/${encodeURIComponent(notesetName)}/${encodeURIComponent(filename)}`;
             }
             return `<img class="img-size-${size}" ${before}src="${src}"${after}>`;
@@ -87,6 +87,7 @@ function transformMarkdown(html, className) {
         /<li>(.*?)%%invis%%/g,
         `<li class="empty-li">$1`
     );
+
     return html;
 }
 

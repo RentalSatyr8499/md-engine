@@ -26,21 +26,36 @@
 * "{{Normalization}}": the process of reorganizing a database so that redundant data is eliminated and all data dependencies make sense.
     * "First Normal Form" (1NF): the data is structured such that each value is {{atomic (aka flat, no nested values)}}, all values in one column are in the same {{domain}}, and data can be stored in any order.
     * "Second Normal Form" (2NF): the data is structured such that: (1) it satisfies {{1NF}}, and (2) there does not exist any {{partial dependencies (none of the columns can be derived from any of the other columns; all columns provide completely new and non-redundant information)}}. To convert to 2NF, we often need to {{decompose the table}}.
-    * "Third Normal Form" (3NF): the data is structured such that it satisfies {{lossless join}} and {{dependency preservation}}. In other words, 3NF is the same as 2NF with the additional constraint of {{forbidding transitive dependencies}}. 
-        * In order to transform a table to 3NF, you must first compute its "{{Canonical cover (Fc)}}". Then, for every FD in Fc, you create a {{relation}}.
-        * "Canonical Cover" (Fc): {{the minimal set of functional dependencies that is still logically equivalent to FD}}. Steps to compute Fc from FD: 
-            1. Write out all the rules in FD.
-            2. Eliminate any reflexive dependencies. Ex. B → BDE becomes {{B → DE}}.
-            3. Eliminate all extraneous attributes: ???
-            4. Transform the remaining FDs into relational tables.
-        * "LHS is super key, or right hand consists of only prime attributes" ??
+    * "Third Normal Form" (3NF): the data is structured such that it satisfies {{lossless join}} and {{dependency preservation}}. In other words, 3NF is the same as 2NF with the additional constraint of {{forbidding transitive dependencies}}.
+        * To check if something is 3NF: 
+            1. Find all candidate keys of R.
+            2. Identify all prime attributes (attributes that belong to at least one candidate key).
+            3. For every non-trivial FD `X → Y`, check that at least one of the following conditions holds: 
+                * `X` is a superkey of R
+                * Every attribute in `Y` is a prime attribute
+            * If any FD violates both of these conditions, R is NOT in 3NF.
+        * To transform a table to 3NF:
+            1. Identify the primary key of R. 
+            2. Write out all the rules in FD.
+            3. Eliminate any reflexive dependencies. Ex. B → BDE becomes {{B → DE}}.
+            4. Eliminate all extraneous attributes. Repeat steps 3-4 until the FDs do not change anymore.
+            5. The remaining FDs are now what's called the "Canonical cover" (Fc). 
+            6. Transform Fc and the primary key into relational tables.
     * "BCNF": the data is structured such that it satisfies {{lossless-join}} and {{redundancy free}}.
+        * To check if something is BCNF: 
+            1. Find F+.
+            2. For every non-trivial FD `X → Y`, check that `X` is a superkey of `R`.
+            * If any FD violates this conditions, R is NOT in BCNF.
         * "Redundancy free": {{given a relation R, for every nontrivial X → Y, X is a super key}}.
         * To convert a database to BCNF: 
             1. Compute F+.
-            2. Choose the longest dependency. Write it as a set of attributes. 
-            3. Continuously split the set up into smaller sets on non-trivial FDs. 
-            4. Repeat until the sets can't be split up anymore.
+            2. Write out all the attributes in R. This is the root node of your tree.
+            3. Choose an attribute `X` such that: 
+                * `X` is non-trivial
+                * `X` is not a superkey of the parent node (if there is a parent node)
+            4. Add two children nodes to the current node such that `X` is the only shared attribute between the two nodes.
+            5. Repeat steps 3-4 until no more children can be made.
+            
 ## Exercises
 ![alt text](image18.png){size=small}
 * Consider the table above. Assume that it includes the entire dataset. For each of the relations below, are they functional dependencies?

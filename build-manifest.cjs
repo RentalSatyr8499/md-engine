@@ -39,6 +39,9 @@ function generateManifest() {
           .filter(f => f.endsWith('.md'))
           .sort((a, b) => a.localeCompare(b));
 
+        // DEBUG: Log processed files per set
+        console.log(`[Manifest Build] ${className} -> ${setName}: Found ${mdFiles.length} files:`, mdFiles);
+
         manifest[className][setName] = {
           description: desc,
           files: mdFiles

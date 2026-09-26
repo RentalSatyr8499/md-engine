@@ -70,26 +70,42 @@ async function loadNoteset(className, notesetName) {
     const loadingMsg = document.getElementById("loading-message");
     if (loadingMsg) loadingMsg.remove();
 
-    for (const { file, md } of files) {
-        // Strip leading sequence numbers (e.g., "00 ") and trailing ".md"
-        const noteTitle = file.replace(/^\d+\s*/, "").replace(/\.md$/i, "");
+    console.log(`[Rendering Noteset] Total files fetched: ${files.length}`);
 
-        const header = document.createElement("h2");
-        header.textContent = noteTitle;
-        header.className = "collapsible-header";
-        header.title = "click to toggle collapse";
+for (const { file, md } of files) {
+    console.log(`[Processing File] ${file}`);
 
-        const content = document.createElement("div");
-        content.className = "note-content collapsible-content";
-
-        applyCollapsibleBehavior(header, content);
-        container.appendChild(header);
-        container.appendChild(content);
-
-        // Pass notesetName along so image paths inside markdown resolve properly
-        content.innerHTML = transformMarkdown(marked.parse(preprocess(md)), className, notesetName);
-        content.querySelectorAll("pre code").forEach(block => hljs.highlightElement(block));
+    if (!md || md.trim() === "") {
+        console.warn(`[Warning] ${file} is empty or failed to load.`);
+        continue;
     }
+
+    const noteTitle = file.replace(/^\d+\s*/, "").replace(/\.md$/i, "");
+    
+    const header = document.createElement("h2");
+    header.textContent = noteTitle;
+    header.className = "collapsible-header";
+    header.title = "click to toggle collapse";
+
+    const content = document.createElement("div");
+    content.className = "note-content collapsible-content";
+
+    applyCollapsibleBehavior(header, content);
+    container.appendChild(header);
+    container.appendChild(content);
+
+    try {
+        const rawHTML = marked.parse(preprocess(md));
+        const transformedHTML = transformMarkdown(rawHTML, className, notesetName);
+        content.innerHTML = transformedHTML;
+        
+        console.log(`[Success] Rendered ${file}`);
+    } catch (parseError) {
+        console.error(`[Parse Error] ${file} failed during marked/transform:`, parseError);
+    }
+
+    content.querySelectorAll("pre code").forEach(block => hljs.highlightElement(block));
+}
 
     document.getElementById("reveal-toggle").style.display = "flex";
     document.getElementById("hamburger").style.display = "flex";

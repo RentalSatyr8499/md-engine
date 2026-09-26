@@ -47,12 +47,22 @@ async function loadMarkdownFiles(className, notesetName) {
     const mdFiles = notesetData.files;
 
     const results = await Promise.all(
-        mdFiles.map(async file => {
-            const filePath = `notes/${encodeURIComponent(className)}/notesets/${encodeURIComponent(notesetName)}/${encodeURIComponent(file)}`;
-            const md = await fetch(filePath).then(r => r.text());
+    mdFiles.map(async file => {
+        const filePath = `notes/${encodeURIComponent(className)}/notesets/${encodeURIComponent(notesetName)}/${encodeURIComponent(file)}`;
+        try {
+            const res = await fetch(filePath);
+            if (!res.ok) {
+                console.error(`[Fetch Failed] ${filePath} HTTP ${res.status}`);
+            }
+            const md = await res.text();
+            console.log(`[Loaded MD] ${file} (${md.length} bytes)`);
             return { file, md };
-        })
-    );
+        } catch (err) {
+            console.error(`[Fetch Error] Failed loading ${file}:`, err);
+            return { file, md: "" };
+        }
+    })
+);
 
     notesCache.set(cacheKey, results);
     return results;
