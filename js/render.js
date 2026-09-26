@@ -60,8 +60,8 @@ function transformMarkdown(html, className, notesetName) {
         (match, before, src, after, size) => {
             if (!/^https?:\/\//i.test(src)) {
                 const filename = src.split("/").pop().replace(/^\.\//, "");
-                // Resolves image paths relative to ./notes/<Class>/notesets/<Noteset>/
-                src = `./notes/${encodeURIComponent(className)}/notesets/${encodeURIComponent(notesetName)}/${encodeURIComponent(filename)}`;
+                // Images live in a shared assets/ folder at the class level
+                src = `./notes/${encodeURIComponent(className)}/assets/${encodeURIComponent(filename)}`;
             }
             const sizeClass = size ? ` img-size-${size}` : '';
             return `<img class="${sizeClass}" ${before}src="${src}"${after}>`;
@@ -94,6 +94,9 @@ function transformMarkdown(html, className, notesetName) {
         /<li>(.*?)%%invis%%/g,
         `<li class="empty-li">$1`
     );
+
+    // 9. Underline: _text_ → <u>text</u>
+    html = html.replace(/<u>(.*?)<u>/g, '<u>$1</u>');
 
     return html;
 }

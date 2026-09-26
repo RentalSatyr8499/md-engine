@@ -32,23 +32,23 @@
         * An n-ary relation is a table that {{has n columns}}.
         * By definition, tuple values are atomic, meaning {{there are no lists or nested structures}}. 
         * (T/F) The special value NULL is allowed in every place in the tuple (is a member of every domain). {{T}}
-    * A "table": {{a list (duplicates allowed) of ordered rows}}. While a relational database theoretically obeys the definition of a "relation", they are often implemented using "tables", meaning additional work needs to be done to ensure that data is organized in a way that is still valid under the relational model paradigm.
+    * A "table": {{a list (duplicates allowed) of ordered rows}}. 
+    * While a relational database theoretically obeys the definition of a "{{relation}}", they are often implemented using "{{tables}}", meaning additional work needs to be done to ensure that data is organized in a way that is still valid under the relational model paradigm.
     * "{{Keys}}" are used to uniquely identify tuples.
         * {{Super}} key: Any set of attributes that uniquely identifies tuples.
-        * {{Candidate}} key: A minimal super key; no unnecessary attributes.
+        * {{Candidate}} key: A minimal super key. None of the attributes can be removed without making it no longer a super key.
         * {{Primary}} key: The chosen candidate key used by the DBMS. This is typically the candidate key with the most important semantic meaning. 
-            * Primary keys must disallow {{NULL}} values. 
-            * Some DBMSs auto-generate primary keys for internal use.
-        * {{Foreign}} key: an "attribute that uniquely identify a row in another table".
+        * {{Foreign}} key: any *"attribute that uniquely identifies a row in another table"*.
+        * Primary keys must disallow {{NULL}} values. 
 
 ## Exercises
-![alt text](image1.png)
+![alt text](image1.png){size=small}
 * Answer the following based on the above image:
-    * Write the schema statement for the relation in the image above: {{`Movies(title: STRING, year: INTEGER, length: INTEGER, genre: STRING)`}}
+    * Write the schema statement for the relation in the image above: {{`Movies(title, year, length, genre)`}}
     * What's the selected tuple? {{`("Star wars", 1977, 124, "sciFi")`}}
     * What's the selected instance? {{`{("Star wars", 1977, 124, "sciFi"),("Wayne's world", 1992, 95, "comedy")}`}}
     * Suppose we stipulate the assumption that all movies can be uniquely identified by their name and their year (no two movies with the same name will be made in the same year). Write the key of the relation. {{`PRIMARY KEY (title, year)`}}
-![alt text](image2.png)
+![alt text](image2.png){size=small}
 * For the image above, list all of the...
     * Super keys: {{`{computingID}, {SSN}, {computingID, SSN}, {computingID, name}, {SSN, name}, {computingID, SSN, name}`}}
     * Candidate keys: {{`{computingID}, {SSN}`}}
