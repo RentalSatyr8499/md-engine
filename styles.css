@@ -1,5 +1,3 @@
-
-
 body {
     font-family: system-ui, sans-serif;
     line-height: 1.6;
@@ -71,11 +69,23 @@ button {
 
 .collapsible-header {
     cursor: pointer;
-    background: #eee;
+    background: #fff;
+    color: inherit;
+    font-weight: normal;
     padding: 10px;
     border-radius: 4px;
     margin-block-start: 0;
     margin-block-end: 0.5em;
+    transition: background 0.2s, color 0.2s;
+}
+
+.collapsible-header.header-open {
+    background: #eee;
+}
+
+.collapsible-header:hover {
+    background: #000;
+    color: #fff;
 }
 
 .note-content {
@@ -108,22 +118,38 @@ button {
 }
 
 .back-button {
-    width: 5vw;
-    height: 5vw;
-    opacity: 0.8;
-    transition: opacity 0.2s;
-    cursor: pointer;
-}
-
-.back-button:hover{
-    opacity: 1;
+    width: 1em;
+    height: 1em;
+    display: block;
 }
 
 .noteset-header {
     display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.3rem;
+}
+
+.noteset-header h1 {
+    font-size: 2.4rem;
+    margin: 0;
+}
+
+.noteset-breadcrumb {
+    display: flex;
     flex-direction: row;
     align-items: center;
-    gap: 3vw;
+    gap: 0.4em;
+    margin-top: 1.5rem;
+    font-size: 0.9rem;
+    color: #333;
+    cursor: pointer;
+    opacity: 0.8;
+    transition: opacity 0.2s;
+}
+
+.noteset-breadcrumb:hover {
+    opacity: 1;
 }
 
 #main-container {

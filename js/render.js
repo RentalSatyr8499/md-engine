@@ -5,15 +5,18 @@ function renderNotesetShell(className, notesetName, description) {
 
     container.innerHTML = `
         <div class="noteset-header">
-            <!-- Ensure src uses relative path ./ -->
-            <img src="./assets/back.png" class="back-button" alt="Back" title="view all notesets">
+            <div class="noteset-breadcrumb">
+                <!-- Ensure src uses relative path ./ -->
+                <img src="./assets/back.png" class="back-button" alt="Back" title="view all notesets">
+                <span class="breadcrumb-text">${className}</span>
+            </div>
             <h1>${notesetName}</h1>
         </div>
         <div id="noteset-description">${description ?? ""}</div>
         <p id="loading-message">Loading notes…</p>
     `;
 
-    document.querySelector(".back-button").onclick = () => {
+    document.querySelector(".noteset-breadcrumb").onclick = () => {
         // Use relative path ?class= instead of /?class= to preserve GitHub Pages subpaths
         history.pushState({}, "", `?class=${encodeURIComponent(className)}`);
         loadNotesets(className);
@@ -115,6 +118,7 @@ function collapseAll() {
         content.classList.remove("open");
         content.style.height = content.scrollHeight + "px";
         requestAnimationFrame(() => { content.style.height = "0px"; });
+        content.previousElementSibling?.classList.remove("header-open");
     });
 }
 
@@ -123,6 +127,7 @@ function uncollapsAll() {
         content.classList.add("open");
         content.style.height = content.scrollHeight + "px";
         setTimeout(() => { content.style.height = "auto"; }, 300);
+        content.previousElementSibling?.classList.add("header-open");
     });
 }
 
@@ -139,6 +144,7 @@ function toggleNav(event) {
 function applyCollapsibleBehavior(header, content) {
     header.onclick = () => {
         const isOpen = content.classList.toggle("open");
+        header.classList.toggle("header-open", isOpen);
 
         if (isOpen) {
             content.style.height = content.scrollHeight + "px";
