@@ -42,7 +42,7 @@
 ## Exercises
 ![alt text](image12.png){size=medium}
 * Consider the image above. 
-    * Interpret the `buys` relationship: {{Each (person, product) pair connects to at most one company. Each (person, company) pair connets to at most one product. Each (company, product) pair connects to many persons.}}
+    * Interpret the `buys` relationship: {{Each (person, product) pair connects to at most one company. Each (person, company) pair connets to many products. Each (company, product) pair connects to many persons.}}
     * One of the records violates the cardinalities stipulated by the diagram. Which is it? {{row four (the last row)}}
 ![alt text](image15.png){size=medium}
 * Consider the image above. Interpret the `have` relationship: {{Every homework must belong to a single class. A course can have many homework. Different courses may have the same homework number. Homework cannot exist without a course; to identify a homework, we need `c_number` and `hw_number`}}.
