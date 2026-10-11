@@ -48,8 +48,14 @@
         "05 tcp.md",
         "06 switches.md",
         "07 arp.md",
-        "08 congestion.md",
-        "09 sim.md"
+        "08 congestion.md"
+      ]
+    },
+    "Part 2": {
+      "description": "",
+      "files": [
+        "01 queues.md",
+        "02 routing.md"
       ]
     }
   },
