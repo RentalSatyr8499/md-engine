@@ -2,6 +2,7 @@
     * "{{Data}} anomaly": when the structure of a table causes incorrect, inconsistent, or unintended behavior when inserting, updating, or deleting data.
     * "{{Redundancy}} anomaly": when the same fact must be stored repeatedly, causing unnecessary duplication
     * "{{Update}} anomaly": when updating a single real‑world fact requires updating multiple tuples
+    * "{{Insertion}} anomaly": when inserting one piece of information is impossible without also providing other, possibly unknown information
     * "{{Deletion}} anomaly": when deleting one piece of information unintentionally deletes other important information.
     * "{{Functional}} dependency": a relationship where one attribute (or set of attributes) uniquely determines another attribute.
 * Functional dependencies allow us to reason formally about the relationships inside a relation and infer new dependencies from ones we already know according to the following rules:
@@ -23,7 +24,7 @@
 * "{{Normalization}}": the process of reorganizing a database so that redundant data is eliminated and all data dependencies make sense.
     * "First Normal Form" (1NF): the data is structured such that each value is {{atomic (aka flat, no nested values)}}, all values in one column are in the same {{domain}}, and data can be stored in any order.
     * "Second Normal Form" (2NF): the data is structured such that: (1) it satisfies {{1NF}}, and (2) there does not exist any {{partial dependencies}}.
-        * "Partial dependency": {{when one column of a table can be derived from other columns of the table}}
+        * "Partial dependency": {{when a non-key attribute depends on only part of a candidate key}}
     * "Third Normal Form" (3NF): the data is structured such that it satisfies {{lossless join}} and {{dependency preservation}}. In other words, 3NF is the same as 2NF with the additional constraint of {{forbidding transitive dependencies}}.
         * Steps to test for proper 3NF!
             1. Find all {{candidate}} keys of R.
@@ -48,7 +49,7 @@
             * Tip on checking if something is in BCNF: again visualize all the attributes as nodes in a graph, and the FDs as edges between those nodes. For each node, try to get to every other node. If so, it's BCNF. 
         * Steps to compute F+ (closure of F)!
             1. Write out all the FDs. 
-            2. Apply all the reflexivity rules. 
+            2. Apply all the reflexivity and {{augmentation}} rules. 
             3. Apply all the transitivity rules. For example, `{X → XY, Z → XZ}` becomes {{`{X → XY, Z → XYZ}`}}.
             4. Repeat steps 2-3 until the list of FDs no longer changes.
             * If you are asked for the "attribute closure" of an attribute X in F, simply write out {{all the attributes implied by X in F+}}.
@@ -76,3 +77,4 @@
 * "*Given R(A,B,C,D,E) and F = { A → C, B → B, C → BD, D → E}, compute F+.*" Answer: {{F+ = {A → ABCDE, C → BCDE, D → DE } }}
     * List out the candidate key(s). {{A}}
 * "*Consider a relation Stocks(B, O, I, S, Q, D). Let the set of FDs for Stocks be FDs = { S → D, I → B, IS → Q, B → O }. List all candidate keys for the Stocks relation.*" Answer: {{IS}}
+    * Tip on listing candidate keys: if an attribute never appears on the {{right-hand side}} of any FD, it must be part of {{every candidate key}}. For Stocks, neither I nor S ever appears on a right-hand side, so IS must be in the key.
