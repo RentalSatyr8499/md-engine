@@ -20,5 +20,3 @@
 * Consider the image above. If we use a FIFO scheduling policy and drop-tail drop policy: 
     * How many packets/ms will the top flow get out? The bottom flow? {{3.5 pkts/ms; 1.5 pkts/ms}}
     * Under min-max fairness, how many packets/ms out does the top flow deserve? The bottom flow? {{2.5 pkts/ms each}}
-![alt text](image-8.png)
-* Calculate the finish times of A1, B1, and C1. 

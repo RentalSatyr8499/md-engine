@@ -1,125 +1,47 @@
-* "SQL" is Structured Query Language. It is declarative, which means you describe what data you want and the database engine figures out how to retrieve it efficiently
-* Identify the four command groups in SQL.
-
-| group | full name | purpose | commands |
-|---|---|---|---|
-| DDL | Data Definition Language | defines structures like tables, views, and indexes, that is the schema | CREATE, ALTER, DROP, TRUNCATE |
-| DML | Data Manipulation Language | works with the instance by retrieving, adding, modifying, and removing rows | SELECT, INSERT, UPDATE, DELETE |
-| DCL | Data Control Language | handles permissions and security, that is who can do what on which part of the database | GRANT, REVOKE |
-| TCL | Transaction Control Language | manages transactions, which are logical units of work | BEGIN TRANSACTION, COMMIT, ROLLBACK |
-
-* "COMMIT" makes changes permanent. "ROLLBACK" undoes changes since the last commit. "BEGIN TRANSACTION" sets a transaction boundary
+* Fill out the table below.
+| group | purpose | commands |
+|---|---|---|
+| {{DDL (Data Definition Language)}} | defines structures like tables, views, and indexes, that is the schema | CREATE, {{ALTER, DROP, TRUNCATE}} |
+| {{DML (Data Manipulation Language)}} | works with the instance by retrieving, adding, modifying, and removing rows | SELECT, {{INSERT, UPDATE, DELETE}} |
+| {{DCL (Data Control Language)}} | handles permissions and security | GRANT, REVOKE |
+| {{TCL (Transaction Control Language)}} | manages transactions (logical units of work) | BEGIN TRANSACTION, COMMIT, ROLLBACK |
+* TCL commands: 
+    * {{`COMMIT`}}: makes changes permanent. 
+    * {{`ROLLBACK`}}: undoes changes since the last commit. 
+    * {{`BEGIN TRANSACTION`}}: sets a transaction boundary
 * Identify the following data types and when to use each one.
-
 | family | types | how to choose |
 |---|---|---|
-| NUMBER | INT, DECIMAL(p,s), FLOAT and DOUBLE | Whole numbers with no decimals take INT. Exact decimals take DECIMAL(p,s). Approximate decimals take FLOAT or DOUBLE |
-| TEXT | CHAR(n), VARCHAR(n), TEXT | Fixed length takes CHAR(n). Variable length takes VARCHAR(n). Long paragraphs take TEXT |
-| DATE and TIME | DATE, TIME, DATETIME and TIMESTAMP | Date only takes DATE. Time only takes TIME. Date and time together take DATETIME or TIMESTAMP |
-| other | BOOLEAN, BLOB | BOOLEAN is true or false. "BLOB" is Binary Large Object, a varying length binary string for files, images, video, and other large objects |
-
-* To constrain a type to a certain size, write the size in parentheses after the type name. VARCHAR(40) holds up to 40 characters. CHAR(3) holds exactly 3 characters. DECIMAL(p,s) holds p digits in total with s of them after the decimal point
-* Identify how each E-R construct becomes a SQL table.
-
-| E-R construct | SQL mapping |
-|---|---|
-| Strong entity set | One table named after the entity set. Attributes become columns and the primary key stays the primary key |
-| Composite attribute | Flatten it into one column per component. Do not keep the higher level attribute |
-| Multivalued attribute | A separate table named entityname_attributename holding the entity key and the values. The primary key is all attributes |
-| One to one relationship | Option 1. A table for each entity set plus a relationship table with UNIQUE on both keys. Option 2. Store one primary key inside the other entity table as a foreign key. Fewer tables and empty values are possible |
-| Many to many relationship | A table for each entity set plus a relationship table holding both primary keys |
-| One to many relationship | Option 1. A table for each entity set plus a relationship table. Option 2. Store the key of the one side inside the many side as a foreign key. Fewer tables and empty values are possible |
-| Total participation | Option 1. A FOREIGN KEY constraint. Option 2. A NOT NULL constraint on the foreign key column |
-| Multi-way relationship | One table per entity set plus one relationship table holding all the keys |
-| Weak entity set | One table holding the strong entity primary key, the discriminator, and the weak entity attributes. The primary key is the strong key plus the discriminator |
-
-* "REFERENCES" declares a foreign key inline. person_phone(id INT REFERENCES person(id), phone VARCHAR(10), PRIMARY KEY (id, phone)). "FOREIGN KEY" declares it as a table constraint. FOREIGN KEY (cname) REFERENCES company(cname)
-* "ALTER TABLE" changes an existing table. ALTER TABLE company ADD ceo VARCHAR(40) adds a column. ALTER TABLE company DROP ceo removes it
-* Contrast DROP, TRUNCATE, and DELETE.
-
-|  | DROP | TRUNCATE | DELETE |
-|---|---|---|---|
-| language | DDL | DDL | DML |
-| syntax | DROP TABLE table_name | TRUNCATE TABLE table_name | DELETE FROM table_name WHERE condition |
-| what it removes | the table definition and all its data | all rows, keeps the schema | specific rows |
-| WHERE clause | cannot use | cannot use | can use |
-| speed | destroys everything at once | faster than DELETE | slower, logs each deletion |
-| AUTO_INCREMENT | gone with the table | resets it | does not reset it |
-| indexes, constraints, triggers | deletes them | keeps them | keeps them |
-| rollback | cannot reverse, implicit COMMIT | cannot reverse, implicit COMMIT | rollback is possible inside a transaction |
-
-* "INSERT INTO" adds new rows. INSERT INTO Student_lecture VALUES ("9999", "85 Engineer's Way", "Database Systems", "Humpty") adds one full row
-* "UPDATE" modifies existing rows. UPDATE Student_lecture SET Teaching_assistant = "Humpty" WHERE S_id = "5678" changes the TA for one student. Without a WHERE clause every row changes, so always include one
-* "DELETE FROM" removes rows. DELETE FROM Student_lecture WHERE Teaching_assistant = "Humpty" removes every row with that TA. Without a WHERE clause the whole table is emptied
-* "SELECT" retrieves data. SELECT * FROM Student_lecture returns every column and row. Naming columns instead of * is called "projection". SELECT S_id, Course FROM Student_lecture returns just those two columns
-* "WHERE" filters rows and conditions combine with AND, OR, and NOT. SELECT S_id, Course FROM Student_lecture WHERE Teaching_assistant = "Minnie" OR Teaching_assistant = "Mickey"
-* "DISTINCT" removes duplicate values from the output. SELECT DISTINCT Teaching_assistant FROM Student_lecture lists each TA once. Without DISTINCT, duplicates may appear in the output of an operator
-* "LIKE" matches text patterns where % is the wildcard. WHERE Course LIKE 'Data%' matches every course name starting with Data
-* "ORDER BY" sorts the output. Ascending is the default and DESC sorts descending. SELECT S_id, Course FROM Student_lecture WHERE Teaching_assistant <> "Dumpty" ORDER BY S_id DESC
-* "AS" renames a column in the output. SELECT S_id AS ID, Course AS "Course Name" FROM Student_lecture. Arithmetic works in the select list too. SELECT Name, two_week_hours/2 AS Hours_per_week FROM hiring
-* Tip on writing queries. Translate and clean up in two passes. First rewrite the English request so it names the exact columns and the table. Then write the SQL. "How many days elapsed between the order date and the ship date for each order" becomes "select the order number, order date, ship date, and ship date minus order date as DaysElapsed from the Orders table" which becomes SELECT OrderNumber, OrderDate, ShipDate, (ShipDate - OrderDate) AS DaysElapsed FROM Orders
+| `NUMBER` | `INT`, `DECIMAL(p,s)`, `FLOAT` and `DOUBLE` | Whole numbers with no decimals take {{`INT`}}. Exact decimals take {{`DECIMAL(p,s)`}}. Approximate decimals take {{`FLOAT`}} or {{`DOUBLE`}} |
+| `TEXT` | `CHAR(n)`, `VARCHAR(n)`, `TEXT` | Fixed length takes {{`CHAR(n)`}}. Variable length takes {{`VARCHAR(n)`}}. Long paragraphs take {{`TEXT`}}|
+| `DATE` and `TIME` | `DATE`, `TIME`, `DATETIME` and `TIMESTAMP` | N/A |
+| other | `BOOLEAN`, `BLOB` | `BOOLEAN` is true or false. `BLOB` is Binary Large Object, which is {{a varying length binary string for files, images, video, and other large objects}} |
+* To constrain a type to a certain size, write the size in parentheses after the type name. Ex. `VARCHAR(40)` holds up to {{40}} characters. `DECIMAL(p,s)` holds {{`p`}} digits in total with {{`s`}} of them after the decimal point.
+* More commands: 
+   * `REFERENCES`: declares a foreign key inline. Ex. if a table `person_phone` has a foreign key in the table `person` named `id`, the `CREATE` statement would look like... {{`person_phone(id INT REFERENCES person(id),... `}}
+    * `FOREIGN KEY`: declares a foreign key as a table constraint, at the end of the `CREATE TABLE` instead of inline. Ex. if a table `makes` has a foreign key `cname` pointing at `company(cname)`, the constraint would look like... {{`FOREIGN KEY (cname) REFERENCES company(cname)`}}
+    * `ALTER TABLE`: changes an existing table, for example by adding or dropping a column. Ex. to add a `ceo` column holding up to 40 characters to the `company` table, you would write... {{`ALTER TABLE company ADD ceo VARCHAR(40)`}}
+    * `INSERT INTO`: adds new rows to a table. Ex. to add the student 9999 at "85 Engineer's Way" taking Database Systems with Humpty as TA to `Student_lecture`, you would write... {{`INSERT INTO Student_lecture VALUES ("9999", "85 Engineer's Way", "Database Systems", "Humpty")`}}
+    * `UPDATE`: modifies existing rows. Without a `WHERE` clause every row changes, so always include one. Ex. to change the TA to Humpty for the student with `S_id` 5678, you would write... {{`UPDATE Student_lecture SET Teaching_assistant = "Humpty" WHERE S_id = "5678"`}}
+    * `DELETE FROM`: removes rows from a table. Without a `WHERE` clause the whole table is emptied. Ex. to remove every row where Humpty is the TA, you would write... {{`DELETE FROM Student_lecture WHERE Teaching_assistant = "Humpty"`}}
+    * `SELECT`: retrieves data from a table. `*` returns every column, and naming columns instead is called projection. Ex. to get just the `S_id` and `Course` columns from `Student_lecture`, you would write... {{`SELECT S_id, Course FROM Student_lecture`}}
+    * `DISTINCT`: removes duplicate values from the output. Ex. to list each teaching assistant only once, you would write... {{`SELECT DISTINCT Teaching_assistant FROM Student_lecture`}}
+    * `LIKE`: matches text patterns, where `%` is the wildcard. Ex. to keep only course names starting with Data, the condition would look like... {{`WHERE Course LIKE 'Data%'`}}
+    * `ORDER BY`: sorts the output. Ascending is the default and `DESC` sorts descending. Ex. to list `S_id` and `Course` for every row except Dumpty's, sorted by `S_id` from largest to smallest, you would write... {{`SELECT S_id, Course FROM Student_lecture WHERE Teaching_assistant <> "Dumpty" ORDER BY S_id DESC`}}
+    * `AS`: renames a column in the output. It also works on computed columns, like `two_week_hours/2`. Ex. to show `S_id` as `ID`, you would write... {{`SELECT S_id AS ID FROM Student_lecture`}}
 ![alt text](image.png){size=medium}
-* Steps to execute a query. Clauses are written in one order but execute in another.
-    1. FROM generates the data set by opening an iterator over the table
-    2. WHERE filters the data set row by row
-    3. GROUP BY aggregates the filtered rows. Note that GROUP BY does not sort the result set
-    4. HAVING filters the groups
-    5. SELECT transforms the remaining data into the output columns
-    6. ORDER BY sorts the output
-* (T/F) Clauses execute in the order they are written. F. SELECT is written first but executes fifth, after FROM, WHERE, GROUP BY, and HAVING
-* "UNION", "INTERSECT", and "EXCEPT" combine the results of two queries. UNION keeps rows appearing in either result. INTERSECT keeps rows appearing in both. EXCEPT keeps rows in the first result but not the second
-
-| requirement | meaning |
-|---|---|
-| same number of columns | both sub-results must select the same number of columns |
-| same column order | the columns must appear in the same order in both |
-| compatible types | each pair of columns must have similar or compatible data types |
-
-* (T/F) INTERSECT and EXCEPT work in every version of MySQL. F. They are not supported in MySQL 5.6 and 5.7. They work in MySQL 8.0 and in MariaDB
-* "Aggregation functions" calculate one value across a whole set of rows or across groups of rows. SQL has five of them.
-
-| function | what it produces |
-|---|---|
-| SUM | the sum of a numerical column |
-| AVG | the average of a numerical column |
-| MIN | the smallest value in a column |
-| MAX | the largest value in a column |
-| COUNT | the number of values in a column, not necessarily distinct |
-
-* Contrast the three forms of COUNT.
-
-| form | what it counts |
-|---|---|
-| COUNT(*) | every row, including rows where the column is NULL |
-| COUNT(column) | only rows where the column is not NULL |
-| COUNT(DISTINCT column) | unique non-NULL values of the column |
-
-* On the loan table, SELECT SUM(amount) FROM loan returns 8700. SELECT AVG(amount) FROM loan returns 1242.857. SELECT COUNT(*) FROM loan returns 7. SELECT COUNT(DISTINCT branch_name) FROM loan returns 5
-* Identify how NULL interacts with aggregation.
-    * The NULL value is ignored in any aggregation. It does not contribute to a sum, an average, or a count, and it cannot become a minimum or a maximum
-    * NULL is treated as an ordinary value when forming groups, so a group with NULL attributes can exist
-    * Aggregating an empty set of values returns NULL, except COUNT which returns 0
-* Contrast WHERE and HAVING.
-
-|  | WHERE | HAVING |
-|---|---|---|
-| filters | individual rows | groups |
-| runs | before GROUP BY | after GROUP BY |
-| unaggregated columns allowed | any column | only columns in the GROUP BY list |
-
-* "GROUP BY" collects rows into groups so each group produces one output row. SELECT branch_name, SUM(amount) FROM loan GROUP BY branch_name returns one total per branch
-* Tip on GROUP BY. Several DBMSs require every non-aggregated column in the SELECT list to appear in the GROUP BY clause. Keep the GROUP BY list small and precise. Extra columns slow the query and make it hard to read
-* "JOIN" combines related tables on key values. Every table needs a unique identifier, the primary key. A related table holds a copy of it, the foreign key, which describes the relationship between the tables
-* Identify the join types.
-
+* (T/F) Clauses execute in the order they are written. {{False! Regardless of the order they are written, clauses are executed like so: `FROM`, `WHERE`, `GROUP BY`, `HAVING`, `SELECT`, `ORDER BY`.}}
+* `UNION`, `INTERSECT`, and `EXCEPT` combine the results of two queries: {{`UNION`}} keeps rows appearing in either result. {{`INTERSECT`}} keeps rows appearing in both. {{`EXCEPT`}} keeps rows in the first result but not the second
+* "{{Aggregation functions}}" calculate one value across a whole set of rows or across groups of rows. SQL has `SUM`, `AVG`, `MIN`, `MAX`, and `COUNT`. 
+    * {{The `NULL` value}} is ignored in any aggregation. 
+    * `GROUP BY` collects rows into groups so each group produces one output row. Ex. `SELECT branch_name, SUM(amount) FROM loan GROUP BY branch_name` returns one total per branch. Several DBMSs require every non-aggregated column in the SELECT list to appear in the GROUP BY clause. Keep the GROUP BY list small and precise - extra columns slow the query and make it hard to read
+* `JOIN` combines related tables on key values:
 | join | the repeated column | which rows survive |
 |---|---|---|
 | NATURAL JOIN | no, the common column appears once | only rows with a match in both tables |
 | (INNER) JOIN with ON | yes, both copies appear | only rows with a match in both tables |
 | LEFT (OUTER) JOIN | depends on the NATURAL or ON form | every row of the left table, missing matches padded with NULL |
 | RIGHT (OUTER) JOIN | depends on the NATURAL or ON form | every row of the right table, missing matches padded with NULL |
-
-* (T/F) FULL JOIN is used often. F. The slides call it uncommon, so we skip it
 * A "Cartesian product" pairs every row of one table with every row of the other. SELECT * FROM one, two and SELECT * FROM one JOIN two with no ON clause both produce it. Most joins are a Cartesian product with the non-matching rows filtered out
 * Joins run as a nested loop. For each row1 in the left table and for each row2 in the right table, output the pair when the join attributes match. With a natural join, skip the pair and move on when there is no match
 * An "outer join" augments a join with its dangling tuples. A dangling tuple is a row with no match in the other table. Outer joins keep it and pad the missing side with NULL values
@@ -153,3 +75,34 @@
 * "Find the IDs and names of all customers who purchased products sold by company 7777 only." Split it in two. First find all customers who purchased anything, with the companies they bought from. Then find all customers who purchased from companies other than 7777. EXCEPT keeps the difference. (SELECT T3.custId, T3.name FROM (SELECT T1.custId, T2.cid FROM Purchase T1 NATURAL JOIN Product T2 GROUP BY T1.custId, T2.cid) T NATURAL JOIN Customer T3) EXCEPT (SELECT T3.custId, T3.name FROM (SELECT T1.custId FROM Purchase T1 NATURAL JOIN Product T2 WHERE T2.cid <> 7777 GROUP BY T1.custId) T NATURAL JOIN Customer T3)
 * Tip on EXCEPT and INTERSECT in MySQL. When the DBMS does not support them, rewrite with joins. EXCEPT becomes a LEFT OUTER JOIN with WHERE result2.custId IS NULL, which keeps rows of the first result with no match in the second. INTERSECT becomes an inner JOIN on the key with SELECT DISTINCT
 * Tip on nested queries. Avoid deeply nested queries when aiming for speed, and be careful about nested query semantics. A correlated subquery runs once per outer row
+* Identify how each E-R construct becomes a SQL table.
+| E-R construct | SQL mapping |
+|---|---|
+| Strong entity set | One table named after the entity set. Attributes become columns and the primary key stays the primary key |
+| Composite attribute | Flatten it into one column per component. Do not keep the higher level attribute |
+| Multivalued attribute | A separate table named entityname_attributename holding the entity key and the values. The primary key is all attributes |
+| One to one relationship | Option 1. A table for each entity set plus a relationship table with UNIQUE on both keys. Option 2. Store one primary key inside the other entity table as a foreign key. Fewer tables and empty values are possible |
+| Many to many relationship | A table for each entity set plus a relationship table holding both primary keys |
+| One to many relationship | Option 1. A table for each entity set plus a relationship table. Option 2. Store the key of the one side inside the many side as a foreign key. Fewer tables and empty values are possible |
+| Total participation | Option 1. A FOREIGN KEY constraint. Option 2. A NOT NULL constraint on the foreign key column |
+| Multi-way relationship | One table per entity set plus one relationship table holding all the keys |
+| Weak entity set | One table holding the strong entity primary key, the discriminator, and the weak entity attributes. The primary key is the strong key plus the discriminator |
+* Contrast DROP, TRUNCATE, and DELETE.
+
+|  | DROP | TRUNCATE | DELETE |
+|---|---|---|---|
+| language | DDL | DDL | DML |
+| syntax | DROP TABLE table_name | TRUNCATE TABLE table_name | DELETE FROM table_name WHERE condition |
+| what it removes | the table definition and all its data | all rows, keeps the schema | specific rows |
+| WHERE clause | cannot use | cannot use | can use |
+| speed | destroys everything at once | faster than DELETE | slower, logs each deletion |
+| AUTO_INCREMENT | gone with the table | resets it | does not reset it |
+| indexes, constraints, triggers | deletes them | keeps them | keeps them |
+| rollback | cannot reverse, implicit COMMIT | cannot reverse, implicit COMMIT | rollback is possible inside a transaction |
+* Contrast the three forms of COUNT.
+
+| form | what it counts |
+|---|---|
+| COUNT(*) | every row, including rows where the column is NULL |
+| COUNT(column) | only rows where the column is not NULL |
+| COUNT(DISTINCT column) | unique non-NULL values of the column |
