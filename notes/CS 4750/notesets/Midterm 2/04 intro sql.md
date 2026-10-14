@@ -106,3 +106,4 @@
 | COUNT(*) | every row, including rows where the column is NULL |
 | COUNT(column) | only rows where the column is not NULL |
 | COUNT(DISTINCT column) | unique non-NULL values of the column |
+* If the `INTERSECT` keyword were not available, how could we find the intersection between queries 1 and 2? ![alt text](image.png)
