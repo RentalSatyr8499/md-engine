@@ -1,2 +1,12 @@
-* When it comes to nested subqueries, a "correlated" query is (?), while an "uncorrelated query" is (?).
-* `ANY`, `ALL`
+* When it comes to nested subqueries, a "correlated" query is {{one whose inner query references the outer query, so it has to be re-evaluated for each outer row}}, while an "uncorrelated query" is {{one whose inner query is independent, so it runs just once}}.
+    * Ex. the names of the employees earning the highest salary for their job is correlated, because the inner query filters on the outer row: {{`SELECT E1.ename FROM HW_emp E1 WHERE E1.sal = (SELECT MAX(E2.sal) FROM HW_emp E2 WHERE E1.job = E2.job)`}}
+    * Ex. the names of the instructors earning the highest salary overall is uncorrelated: {{`SELECT name FROM instructor WHERE salary = (SELECT MAX(salary) FROM instructor)`}}
+* `ANY` (exists): the comparison holds for {{at least one}} row the subquery returns. Ex. the names of the customers with some purchase over $1000: {{`SELECT DISTINCT T1.name FROM Customer T1 WHERE 1000 < ANY (SELECT price FROM Purchase T2 WHERE T1.custId = T2.custId)`}}
+* `ALL` (for all): the comparison holds for {{every}} row the subquery returns. Ex. the names of the customers whose purchases are all over $1000: {{`SELECT DISTINCT T1.name FROM Customer T1 NATURAL JOIN Purchase WHERE 1000 < ALL (SELECT T2.price FROM Purchase T2 WHERE T1.custId = T2.custId)`}}
+* `EXISTS` / `NOT EXISTS`: tests whether the subquery returns {{any rows at all}}. Ex. the branch names with customers having both loans and accounts: {{`SELECT T1.branch_name FROM account T1 WHERE EXISTS (SELECT * FROM depositor D NATURAL JOIN borrower B WHERE D.account_number = T1.account_number)`}}
+* `IN` / `NOT IN`: tests membership in what the subquery returns, which also {{decorrelates}} the query. Ex. the same branches query without correlation: {{`SELECT T1.branch_name FROM account T1 WHERE T1.account_number IN (SELECT D.account_number FROM depositor D NATURAL JOIN borrower B)`}}
+    * `IN` with a literal list is just shorthand for `OR`: {{`WHERE course_id IN ('CS-101', 'CS-315', 'BIO-101')`}} means the same as chaining the three `=` tests with `OR`.
+* "For all" questions are usually rewritten as "there does not exist": to find the customers whose purchases are only over $1000, {{first find the customers with some purchase at or under $1000, then exclude them}}.
+    * With `NOT IN`: {{`SELECT DISTINCT T1.name FROM Customer T1 NATURAL JOIN Purchase P WHERE T1.custId NOT IN (SELECT T2.custId FROM Purchase T2 WHERE T2.price <= 1000)`}}
+    * With `NOT EXISTS`: {{`SELECT DISTINCT T1.name FROM Customer T1 NATURAL JOIN purchase WHERE NOT EXISTS (SELECT * FROM purchase T2 WHERE T1.custId = T2.custId AND T2.price <= 1000)`}}
+* Tip: avoid nested queries when you are aiming for speed, and be careful about the semantics of correlated vs uncorrelated.
