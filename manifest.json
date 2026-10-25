@@ -116,7 +116,8 @@
     "Midterm 2": {
       "description": "",
       "files": [
-        "04 sql.md"
+        "04 intro sql.md",
+        "05 advanced sql.md"
       ]
     }
   }
