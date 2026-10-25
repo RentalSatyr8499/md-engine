@@ -20,8 +20,20 @@
 * link-state routing: instead of sharing only neighbor vectors, {{every router learns the complete map of the network}}, and then each router independently computes its own shortest paths with {{Dijkstra's algorithm}}.
     * OSPF: the example link-state protocol. Routers flood {{link-state advertisements (LSAs)}} describing their links; {{sequence numbers}} and a {{max age}} keep LSAs fresh; one {{designated router}} per subnetwork makes the flooding reliable. Every router builds the same {{link-state database}} and runs Dijkstra on it.
     * To scale, OSPF splits the network into {{areas}} connected through a {{backbone (area 0)}}; area border routers exchange {{summaries, which are really just distance vectors}} between areas.
-
-other bullets likely need to be added in between existing bullets
+    * How does the backbone resrtiction prevent loops from occuring? 
+    * What drawbacks can come from just backbones? How do "virtual links" fix it?
+* "Autonomous system" (AS): 
+* Relationship types
+    * provider/customer
+    * peer/peer
+* Connecting big networks: 
+* BGP:
+    * What problem it's solving (sharing routes between networks):
+    * Difference between EGBP and IBGP: 
+    * Describe bgp (what info is shared and why?): 
+    * How does BGP avoid the count to inginity problem?
+    * "Multi-exit discriminator": 
+    * How ties are broken between multiple routes: (in order ) most specific, local policy, shortest as path, lw=oer as number, lower MED, best route within current AS
 
 ## Exercises
 * Suppose that the Ethernet header and trailer together are 26 bytes, the IPv4 header is 20 bytes with no options, and the TCP header is 20 bytes plus 16 bytes of options. Suppose the local network supports Ethernet payloads of up to 65,535 bytes, while the remote network supports Ethernet payloads of up to 1,500 bytes, and fragmentation occurs when packets travel between the two networks. 
@@ -29,3 +41,9 @@ other bullets likely need to be added in between existing bullets
     * Calculate the overhead for 64,000-byte TCP segments: {{The remote network supports Ethernet payloads of at most 1,500 bytes. Since each IP fragment needs a 20-byte IP header, it can carry at most `1500 - 20 = 1480 bytes` of the original IP packet’s contents. A 64,000-byte TCP segment, including its 36-byte TCP header, produces an IP packet of 64,036 bytes. Dividing 64,036 by 1,480 gives approximately 43.27, so we need 44 fragments. Each fragment adds 46 bytes of IP and Ethernet overhead (20 + 26). That's `44*46 = 2024` total bytes of IP and Ethernet overhead across 44 fragments. We then add the 36-byte TCP header, which appears only once, giving 2,060 bytes of total overhead. `2,060/64,000` gives an overhead-to-data ratio of approximately 3.22%.}}
     * Determine the TCP segment size that results in the highest overhead: {{1 byte}}
 * slide 33
+![alt text](image.png)
+* Explain why this situation might come to be.
+![alt text](image-8.png)
+* Explain why a situation like this doesn't make sense. (no one paying office to transit traffic)
+![alt text](image-12.png)
+* Explain why a situation like this doesn't make sense. (no one paying isp a)
