@@ -63,12 +63,12 @@
     "Part 1": {
       "description": "",
       "files": [
-        "01 intro.md",
-        "02 asm.md",
+        "01 Intro.md",
+        "02 ASM.md",
         "03 executables.md",
         "04 reverse engineering.md",
         "05 x86 encoding.md",
-        "06 virus.md",
+        "06 Virus.md",
         "07 heuristic detection.md",
         "08 anti-anti viruses.md"
       ]
@@ -117,7 +117,16 @@
       "description": "",
       "files": [
         "04 intro sql.md",
-        "05 advanced sql.md"
+        "05 advanced sql.md",
+        "06 db interfacing.md",
+        "07 db security.md"
+      ]
+    },
+    "Midterm 3": {
+      "description": "",
+      "files": [
+        "08 relational algebra.md",
+        "09 query cost estimation.md"
       ]
     }
   }
